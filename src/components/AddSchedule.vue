@@ -3,14 +3,18 @@
   import Button from "./Button.vue";
   import Input from "./Input.vue";
   import Select from "./Select.vue";
+  import TextArea from "./Textarea.vue";
 
   const startDate = ref("");
   const endDate = ref("");
+  const frequency = ref(0);
+  const frequencyOptions = ref([]);
   const reccurencePattern = ref(0);
   const recurrenceOptions = ref([{
     id: 0,
     description: "Select recurrence pattern"
   }]);
+  const serviceDescription = ref("");
 
   const props = defineProps({
     closeCallBack: {
@@ -21,6 +25,10 @@
   
   const handleSaveSchedule = async () => {
     alert("Test");
+  }
+
+  const handleFrequency = async () => {
+
   }
 
   const handleReccurencePattern = async () => {
@@ -90,13 +98,11 @@
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                 <span class = "">Frequency</span>
               </div>
-              <Input
-                v-model = "endDate"
-                :inputValue = "endDate?.value"
-                inputType = "date"
-                inputPlaceholder = "Start date of Service"
-                inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                :isDisabled = "false"
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
               />
             </div>
           </div>
@@ -112,9 +118,129 @@
                 :options = "recurrenceOptions"
               />
             </div>
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Service Description</span>
+              </div>
+              <TextArea
+                :textAreaModel = "serviceDescription"
+                textAreaClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white h-32"
+              />
+            </div>
           </div>
           <div class = "px-8 mt-8 font-bold text-sky-500 md:text-left lg:text-left xl:text-left 2xl:text-left text-2xl uppercase">
-            <span class=''>Service Log</span>
+            <span class=''>Service Log</span><br/><span class = 'normal-case text-xs italic font-light dark:text-yellow-400 '>This form is OPTIONAL. Can be filled out after the Service</span>
+          </div>
+          <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Group to handle</span>
+              </div>
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
+              />
+            </div>
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Performed by</span>
+              </div>
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
+              />
+            </div>
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Supervised by</span>
+              </div>
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
+              />
+            </div>
+          </div>
+          <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Service Purchase Order</span>
+              </div>
+              <Input
+                v-model = "startDate"
+                :inputValue = "startDate?.value"
+                inputType = "text"
+                inputPlaceholder = "Purchase Order Number"
+                inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                :isDisabled = "false"
+              />
+            </div>
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Incurred Cost</span>
+              </div>
+              <Input
+                v-model = "endDate"
+                :inputValue = "endDate?.value"
+                inputType = "text"
+                inputPlaceholder = "Service Cost"
+                inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                :isDisabled = "false"
+              />
+            </div>
+            
+          </div>
+          <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Equipment used</span>
+              </div>
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
+              />
+            </div>
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Service Status</span>
+              </div>
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
+              />
+            </div>
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Asset Status</span>
+              </div>
+              <Select
+                :onChangeEvent="handleFrequency"
+                :selectId = "frequency"
+                selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
+                :options = "frequencyOptions"
+              />
+            </div>
+            
+          </div>
+          <div class = "flex grid grid-cols-1 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Other Details</span>
+              </div>
+              <TextArea
+                :textAreaModel = "serviceDescription"
+                textAreaClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white h-32"
+              />
+            </div>
           </div>
           <div className = "flex justify-end m-4 p-6">
             <Button
