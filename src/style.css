@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-image:linear-gradient(rgba(9, 25, 67, 0.5), rgba(64, 64, 64, 0.8)), url('https://webappservice-stg.robinsonsland.com/src/img/DARKCROP Victor Render.jpg');
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    background-image:linear-gradient(rgba(29, 78, 216, 0.3), rgba(179, 179, 179, 0.3)), url('https://webappservice-stg.robinsonsland.com/src/img/LIGHT - Victor Render.png');
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity:0;
+  }
+  100% {
+    opacity:1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity:1;
+  }
+  100% {
+    opacity:0;
+  }
+}

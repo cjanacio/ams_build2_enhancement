@@ -1,0 +1,53 @@
+CREATE TABLE frequency (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    asset_type_id INT(11) NOT NULL,
+    frequency VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE frequency_condition (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    frequency_id INT(11) NOT NULL,
+    frequency_condition VARCHAR(150) NOT NULL
+);
+
+CREATE TABLE service_description (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    frequency_id INT(11) NOT NULL,
+    description VARCHAR(1000) NOT NULL
+);
+
+CREATE TABLE personnel (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    frequency_id INT(11) NOT NULL,
+    description VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE service_result (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE asset_service_log (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    asset_id INT(11) NOT NULL, /* Asset ID */
+    service_type_id INT(11) NOT NULL, /* PM or On Demand */
+    frequency_id INT(11) NULL, /* Monthly, Quarterly, etc. IDs. not applicable if service type is On Demand */
+    frequency_condition_id INT(11) NULL, /* Conditions based on frequency (if Monthly, what day of the month is it). not applicable if service type is On Demand */
+    service_date DATETIME NOT NULL, /* Asset Service date */
+    service_start_date DATETIME NOT NULL, /* Asset Service date actual start */
+    service_end_date DATETIME NOT NULL, /* Asset Service date actual end */
+    running_hours DECIMAL(10,0) NULL, /* -- WILL DISCUSS FURTHER -- */
+    group_of_personnel INT(11) NOT NULL, /* Third party or Internal engrs */
+    performed_by INT(11) NOT NULL, /* Who performed the Service */
+    supervised_by INT(11) NOT NULL, /* Who supervised the Service */
+    service_result INT(11) NOT NULL, /* Open, Closed, Canceled */
+    service_po VARCHAR(255) NULL, /* Service Purchase Order */
+    service_cost DECIMAL(10,0) NULL, /* Service Cost */
+    status_id INT(11) NOT NULL, /* Asset Status */
+    service_remarks VARCHAR(1000) NOT NULL, /* Service Remarks */
+    equipment_used VARCHAR(1000) NOT NULL, /* Equipment Used in the Service */
+    created_by INT(11) NOT NULL,
+    date_created DATETIME NOT NULL,
+    updated_by INT(11),
+    date_updated DATETIME
+);
