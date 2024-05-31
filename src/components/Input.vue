@@ -13,10 +13,6 @@
       type: String,
       required: true
     },
-    inputValue: {
-      type: String,
-      required: false
-    },
     isDisabled: {
       type: Boolean,
       required: true
@@ -30,7 +26,6 @@
     :type="inputType"
     :placeholder="inputPlaceholder"
     :class="inputClass"
-    :value="model"
     :autocomplete="'off'"
     :disabled="isDisabled"
     v-if="inputType !== 'file'"
@@ -40,7 +35,6 @@
     :type="inputType"
     :placeholder="inputPlaceholder"
     :class="inputClass"
-    :value="inputValue"
     :autocomplete="'off'"
     :disabled="isDisabled"
     multiple

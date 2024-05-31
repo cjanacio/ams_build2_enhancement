@@ -1,0 +1,37 @@
+CREATE TABLE asset_wo (
+  id INT PRIMARY KEY,
+  asset_id INT NOT NULL,
+  title VARCHAR(1000) NOT NULL,
+  frequency_id INT,
+  service_type_id INT NOT NULL,
+  service_start_date DATE NOT NULL,
+  service_end_date DATE NOT NULL,
+  service_result_id INT NOT NULL,
+  actual_performed_date DATE NOT NULL,
+  total_po_cost DECIMAL(10,2) NOT NULL,
+  status_id INT NOT NULL,
+  created_by INT NOT NULL,
+  date_created DATETIME NOT NULL,
+  updated_by INT NOT NULL,
+  date_updated DATETIME NOT NULL
+);
+
+CREATE TABLE asset_wo_details (
+  id INT PRIMARY KEY,
+  service_log_id INT NOT NULL,
+  service_description_id INT NOT NULL,
+  group_of_personnel_id INT,
+  performed_by VARCHAR(255),
+  supervised_by VARCHAR(255),
+  service_status_id INT,
+  actual_performed_date DATE,
+  service_po VARCHAR(255),
+  service_cost DECIMAL(10,2),
+  service_remarks VARCHAR(1000),
+  equipment_used VARCHAR(255),
+  running_hours DECIMAL(10,2),
+  created_by INT NOT NULL,
+  date_created DATETIME NOT NULL,
+  updated_by INT NOT NULL,
+  date_updated DATETIME NOT NULL
+);

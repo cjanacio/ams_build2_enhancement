@@ -1,18 +1,11 @@
 <script setup>
+  import { onMounted } from 'vue';
   import Options from './Option.vue';
   const model = defineModel();
   defineProps({
-    selectValue: {
-      type: [String, Number],
-      require: true
-    },
     selectClass: {
       type: String,
       require: true
-    },
-    selectId: {
-      type: String,
-      require: false
     },
     onChangeEvent: {
       type: Function,
@@ -27,11 +20,11 @@
       require: false
     },
   });
+
 </script>
 <template>
   <select
     :class="selectClass"
-    :value="selectValue"
     v-model="model"
     @change="onChangeEvent"
     :disabled="isDisabled"
@@ -42,6 +35,7 @@
         :key="option.id || index"
         :optionText="option.description"
         :optionValue="option.id || index"
+        :setSelected="index === 0"
       />
     </template>
   </select>

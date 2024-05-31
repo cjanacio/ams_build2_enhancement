@@ -45,7 +45,12 @@
     :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }"
     :disabled="isDisabled"
   >
-    <span v-if="iconSetting"><i class = "iconSetting"></i>&nbsp;</span>
-    {{ buttonText }}
+    <span v-if="iconSetting && buttonText">
+      <i :class = "iconSetting"></i>&nbsp;{{ buttonText }}
+    </span>
+    <span v-else>
+      <i :class = "iconSetting"></i>
+    </span>
+    
   </button>
 </template>
