@@ -3,7 +3,7 @@
   import axios from 'axios';
   import tippy, { followCursor } from 'tippy.js';
   import 'tippy.js/dist/tippy.css';
-  import { PARAM_URL, AMS_MODEL_PATH } from "./assets/global.js";
+  import { __ENV__, PARAM_URL, AMS_MODEL_PATH } from "./assets/global.js";
   import { ref, onMounted } from 'vue';
   import FullCalendar from '@fullcalendar/vue3';
   import dayGridPlugin from '@fullcalendar/daygrid';
@@ -12,7 +12,7 @@
   import AddSchedule from './components/AddSchedule.vue';
   import ScheduleInfo from './components/ScheduleInfo.vue';
   import Button from './components/Button.vue';
-  window.location.assign(`${ PARAM_URL }#1&1&1`);  /* DEV PURPOSES */
+  __ENV__ === "DEV" && window.location.assign(`${ PARAM_URL }#1&1&1`);  /* DEV PURPOSES */
 
   /* START STATE MANAGEMENT */
   const parentClass = ref("bg-rob-mall-2 bg-white bg-no-repeat bg-local bg-right bg-contain dark:bg-slate-800/70 dark:bg-rob-mall-5 w-full");
@@ -168,7 +168,7 @@
 
   /* START VUE METHODS MANAGEMENT */
   onMounted(async () => {
-    events.value = await calendarInit();
+    // events.value = await calendarInit();
   });
   /* END VUE METHODS MANAGEMENT */
   

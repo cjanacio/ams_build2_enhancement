@@ -1,4 +1,5 @@
 <script setup>
+  import { ref } from 'vue';
   const model = defineModel();
   defineProps({
     inputType: {
@@ -18,6 +19,13 @@
       required: true
     },
   });
+
+  const inputFile = ref(null);
+  const clearInputComponent = () => {
+    inputFile.value.value = null;
+  }
+
+  defineExpose({ clearInputComponent });
 </script>
 
 <template>
@@ -32,6 +40,7 @@
   />
   <input
     v-else
+    ref = "inputFile"
     :type="inputType"
     :placeholder="inputPlaceholder"
     :class="inputClass"
