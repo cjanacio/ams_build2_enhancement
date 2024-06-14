@@ -55,6 +55,7 @@
   const equipmentUsed = ref("");
   const serviceDocs = ref([]);
   const serviceDocInput = ref(null);
+  const testingDate = ref("");
 
   const validateDateFormat = (dateInput) => {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
@@ -67,6 +68,7 @@
   const handleServiceType = (e) => {
     e.preventDefault();
     recurrence.value = parseInt(e.target.value) === 3 ? props.start : "";
+    testingDate.value = parseInt(e.target.value) === 6 ? props.start : "";
   }
   
   const handleSaveSchedule = async () => {
@@ -140,7 +142,8 @@
         }
         purchaseOrder.value && formData.append("purchaseOrder", purchaseOrder.value);
         incurredCost.value && formData.append("incurredCost", incurredCost.value);
-        equipmentUsed.value && formData.append("equipmentUsed", equipmentUsed.value);
+        equipmentUsed.value && formData.append("equipmentUsed", equipmentUsed.value);testingDate
+        testingDate.value && formData.append("testingDate", testingDate.value);
         serviceDocs.value.map((file, index) => {
           formData.append(`docs${ index }`, file);
         });
@@ -470,7 +473,7 @@
                 />
               </div>
             </div>
-            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
               <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
                 <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                   <span class = "">Service Purchase Order</span>
@@ -495,9 +498,21 @@
                   :isDisabled = "false"
                 />
               </div>
+              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                  <span class = "">Actual Start Date</span>
+                </div>
+                <Input
+                  v-model = "testingDate"
+                  inputType = "date"
+                  inputPlaceholder = "Testing Date"
+                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  :isDisabled = "false"
+                />
+              </div>
               
             </div>
-            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
               <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
                 <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                   <span class = "">Equipment used</span>

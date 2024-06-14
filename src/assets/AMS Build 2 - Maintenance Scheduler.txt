@@ -1,0 +1,6 @@
+AMS Build 2: Maintenance Scheduler
+
+- Performed and Supervised by input
+  - Is it free text or from AD
+- Email notification of schedule (or is it necessary)
+  - Who's going to receive the email notifying that a PM or OdM has been created.

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const __ENV__ = "PRD";
+export const __ENV__ = "DEV";
 export const PARAM_URL = "";
 export const GLOBAL_PATH = __ENV__ === "DEV" ? "http://localhost/utility-consolidation/" : "./model/global_model.php";
 export const AMS_MODEL_PATH = __ENV__ === "DEV" ? "http://localhost/asset-monitoring/" : "./genset/model/service_schedule.php";

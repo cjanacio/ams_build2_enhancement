@@ -5,6 +5,8 @@
   import { ref, onMounted, onUnmounted } from 'vue';
   import Button from "./Button.vue";
   import ServiceTable from "./ServiceTable.vue";
+  import ServiceLogInfo from "./ServiceLogInfo.vue";
+  import FileListing from "./FileListing.vue";
 
   const toast = useToast();
 
@@ -26,9 +28,11 @@
   const start = ref("");
   const color = ref("");
   const maintenance = ref("");
+  const maintenanceId = ref(0);
   const eventTitle = ref("");
   const frequencySched = ref("");
   const serviceDescription = ref([]);
+  const serviceDocs = ref([]);
 
   const handleUnmountComponent = (e) => {
     if (e.key === "Escape") {
@@ -74,9 +78,11 @@
           dateCreated,
           assetType,
           maintenanceType,
+          maintenanceTypeId,
           frequencySchedule,
           legend,
-          details
+          details,
+          files
         } = result.workOrder;
 
         eventTitle.value = title;
@@ -89,6 +95,8 @@
         frequencySched.value = frequencySchedule;
         color.value = legend;
         serviceDescription.value = details;
+        maintenanceId.value = maintenanceTypeId;
+        serviceDocs.value = files;
 
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -178,14 +186,35 @@
           </div>
           
           <div class = "text-sm dark:text-white flex grid grid-cols-1 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
-            <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                <span class = "">Services:</span>
+            <div class='rounded border border-slate-300 dark:border-slate-600 p-2 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div v-if = "maintenanceId === 3">
+                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                  <span class = "">Services:</span>
+                </div>
+                <ServiceTable
+                  :serviceData = "serviceDescription"
+                />
               </div>
-              <ServiceTable
-                :serviceData = "serviceDescription"
-              />
+              <div v-else-if = "maintenanceId === 6">
+                <div class = "dark:text-slate-400 text-center font-bold text-sm uppercase my-2 mb-4">
+                  <span class = "">Service Log:</span>
+                </div>
+                <ServiceLogInfo
+                  :serviceData = "serviceDescription"
+                />
+              </div>
+              <div class = "mt-1 flex grid grid-cols-1">
+                <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+                  <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                    <span class = "">Service Documents</span>
+                  </div>
+                  <FileListing :serviceDocs = "serviceDocs"/>
+                  
+                </div>
+              </div>
+              
             </div>
+            
           </div>
 
           <div className = "flex justify-end m-4 p-6">

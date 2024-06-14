@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import TableRow from './ServiceTableRow.vue';
 const props = defineProps({
   serviceData: {
@@ -7,7 +7,6 @@ const props = defineProps({
     require: true
   }
 });
-const triggerAppend = ref(false);
 
 </script>
 
