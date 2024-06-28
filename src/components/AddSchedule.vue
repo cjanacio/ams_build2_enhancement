@@ -54,8 +54,8 @@
   const incurredCost = ref("");
   const equipmentUsed = ref("");
   const serviceDocs = ref([]);
-  const serviceDocInput = ref(null);
-  const testingDate = ref("");
+  const testingStartDate = ref("");
+  const testingEndDate = ref("");
 
   const validateDateFormat = (dateInput) => {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
@@ -68,7 +68,8 @@
   const handleServiceType = (e) => {
     e.preventDefault();
     recurrence.value = parseInt(e.target.value) === 3 ? props.start : "";
-    testingDate.value = parseInt(e.target.value) === 6 ? props.start : "";
+    testingStartDate.value = parseInt(e.target.value) === 6 ? props.start : "";
+    testingEndDate.value = parseInt(e.target.value) === 6 ? props.end : "";
   }
   
   const handleSaveSchedule = async () => {
@@ -136,14 +137,14 @@
         if (!assetStatus.value) {
           throw new Error ("Asset status is required.");
         }
-
         if (!serviceDescriptionText.value) {
           throw new Error ("Service Description textbox is required");
         }
         purchaseOrder.value && formData.append("purchaseOrder", purchaseOrder.value);
         incurredCost.value && formData.append("incurredCost", incurredCost.value);
-        equipmentUsed.value && formData.append("equipmentUsed", equipmentUsed.value);testingDate
-        testingDate.value && formData.append("testingDate", testingDate.value);
+        equipmentUsed.value && formData.append("equipmentUsed", equipmentUsed.value);
+        testingStartDate.value && formData.append("testingStartDate", testingStartDate.value);
+        testingEndDate.value && formData.append("testingEndDate", testingEndDate.value);
         serviceDocs.value.map((file, index) => {
           formData.append(`docs${ index }`, file);
         });
@@ -228,24 +229,9 @@
     }
   }
 
-  const handleFileAttachment = (e) => {
+  const handleFileAttachment = (filesAttached) => {
+    console.log(filesAttached);
     serviceDocs.value = [];
-    const filesAttached = Array.from(e.target.files);
-    let validFiles = true;
-    filesAttached.map(file => {
-      if (file.type !== "application/pdf") {
-        toast.warning("You can only attach PDF files", {
-          icon: "fa-solid fa-triangle-exclamation",
-        });
-        validFiles = false;
-      }
-    });
-    if (!validFiles) {
-      serviceDocInput.value.clearInputComponent();
-      serviceDocs.value = [];
-
-      return false;
-    }
     serviceDocs.value.push(...filesAttached);
   }
 
@@ -434,155 +420,29 @@
             </div>
           </div>
           <div class = "text-sm dark:text-white flex grid grid-cols-1 gap-4" v-else-if = "maintenance === 6">
-            <div class = "px-8 mt-8 font-bold text-sky-500 md:text-left lg:text-left xl:text-left 2xl:text-left text-2xl uppercase">
-              <span class=''>Service Log</span>
-            </div>
-            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Handled by</span>&nbsp;<span class="text-red-500">*</span>
-                </div>
-                <Select
-                  selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
-                  :options = "handlerOptions"
-                  v-model = "handler"
-                />
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Performed by</span>&nbsp;<span class="text-red-500">*</span>
-                </div>
-                <Input
-                  v-model = "performedBy"
-                  inputType = "text"
-                  inputPlaceholder = "Performed the service"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                />
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Supervised by</span>&nbsp;<span class="text-red-500">*</span>
-                </div>
-                <Input
-                  v-model = "supervisedBy"
-                  inputType = "text"
-                  inputPlaceholder = "Supervised the service"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                />
-              </div>
-            </div>
-            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Service Purchase Order</span>
-                </div>
-                <Input
-                  v-model = "purchaseOrder"
-                  inputType = "text"
-                  inputPlaceholder = "Purchase Order Number"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                />
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Incurred Cost</span>
-                </div>
-                <Input
-                  v-model = "incurredCost"
-                  inputType = "text"
-                  inputPlaceholder = "Service Cost"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                />
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Actual Start Date</span>
-                </div>
-                <Input
-                  v-model = "testingDate"
-                  inputType = "date"
-                  inputPlaceholder = "Testing Date"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                />
-              </div>
-              
-            </div>
-            <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Equipment used</span>
-                </div>
-                <Input
-                  v-model = "equipmentUsed"
-                  inputType = "text"
-                  inputPlaceholder = "Equipment used during Service"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                />
-                
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Service Status</span>&nbsp;<span class="text-red-500">*</span>
-                </div>
-                <Select
-                  v-model = "serviceResult"
-                  selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
-                  :options = "serviceResultOptions"
-                />
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Asset Status</span>&nbsp;<span class="text-red-500">*</span>
-                </div>
-                <Select
-                  v-model = "assetStatus"
-                  selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
-                  :options = "assetStatusOptions"
-                />
-              </div>
-              
-            </div>
-            <div class='flex grid grid-cols-1 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Service Description</span>&nbsp;<span class="text-red-500">*</span>
-                </div>
-                <TextArea
-                textAreaClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white h-32"
-                v-model = "serviceDescriptionText"
-                />
-              </div>
-              <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">Attach Service Documents</span>
-                </div>
-                <Input
-                  ref = "serviceDocInput"
-                  @change = "handleFileAttachment"
-                  inputType = "file"
-                  inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                  :isDisabled = "false"
-                  inputPlaceholder = "Attach Documents"
-
-                />
-                <ul class = "px-4 mt-2 text-left" v-if = "serviceDocs.length > 0">
-                  <li class = "font-bold dark:text-gray-300 text-gray-800 list-disc" v-for = "serviceDoc in serviceDocs">
-                    <i class = "fa-solid fa-file-pdf">&nbsp;</i>{{ serviceDoc.name }}
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <AddServiceLog
+              v-model:handler = "handler"
+              v-model:purchaseOrder = "purchaseOrder"
+              v-model:incurredCost = "incurredCost"
+              v-model:performedBy = "performedBy"
+              v-model:supervisedBy = "supervisedBy"
+              v-model:testingStartDate = "testingStartDate"
+              v-model:testingEndDate = "testingEndDate"
+              v-model:equipmentUsed = "equipmentUsed"
+              v-model:serviceResult = "serviceResult"
+              v-model:assetStatus = "assetStatus"
+              v-model:serviceDescriptionText = "serviceDescriptionText"
+              @attach-file = "handleFileAttachment"
+              :serviceResultOptions = "serviceResultOptions"
+              :handlerOptions = "handlerOptions"
+              :assetStatusOptions = "assetStatusOptions"
+              :serviceDocs = "serviceDocs"
+            />
           </div>
           
-          <div class = "text-center">
+          <!-- <div class = "text-center">
             <span class = "font-normal text-xs dark:text-yellow-400 text-slate-800">NOTE: </span>
-          </div>
+          </div> -->
 
           <div className = "flex justify-end m-4 p-6">
             <Button

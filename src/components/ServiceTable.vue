@@ -1,10 +1,18 @@
 <script setup>
 import { ref } from 'vue';
-import TableRow from './ServiceTableRow.vue';
+import ServiceTableRow from './ServiceTableRow.vue';
 const props = defineProps({
   serviceData: {
     type: Array,
     require: true
+  },
+  assetId: {
+    type: Number,
+    required: true
+  },
+  workOrderId: {
+    type: Number,
+    required: true
   }
 });
 
@@ -20,11 +28,14 @@ const props = defineProps({
       </tr>
     </thead>
     <tbody>
-      <TableRow
+      <ServiceTableRow
         v-for = "service in serviceData"
         v-if = "serviceData.length > 0"
         :service = "service"
         :key = "service.id"
+        :assetId = "props.assetId"
+        :serviceCount = "serviceData.length"
+        :workOrderId = "props.workOrderId"
       />
       <tr aria-colspan="3" v-else>
         <td class = "uppercase font-bold">No Work Order Service found.</td>

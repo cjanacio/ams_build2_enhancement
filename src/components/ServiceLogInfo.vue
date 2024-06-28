@@ -1,14 +1,14 @@
 <script setup>
+  import { onMounted } from 'vue';
   const props = defineProps({
     serviceData: {
       type: Array,
       required: true
     }
   });
-  import { onMounted } from 'vue';
   
   onMounted(() => {
-    console.log(props.serviceData[0].serviceResult);
+    console.log(props.serviceData);
   });
   
 </script>
@@ -48,7 +48,7 @@
         </div>
       </div>
     </div>
-    <div class = "mt-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1">
+    <div class = "mt-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-1">
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Service Purchase Order</span>
@@ -69,18 +69,32 @@
           </span>
         </div>
       </div>
+      
+    </div>
+    <div class = "mt-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-1">
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Actual Start Date</span>
           </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
-            {{ props.serviceData[0].testDate }}
+            {{ props.serviceData[0].testStartDate }}
           </span>
         </div>
       </div>
-      
+      <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+        <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
+          <span class = "">Actual End Date</span>
+          </div>
+        <div class = "text-left">
+          <span class="dark:text-slate-200 font-bold text-left">
+            {{ props.serviceData[0].testEndDate }}
+          </span>
+        </div>
+      </div>
     </div>
+    
+      
     <div class = "mt-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1">
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">

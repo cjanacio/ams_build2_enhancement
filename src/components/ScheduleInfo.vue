@@ -22,6 +22,7 @@
   });
 
   const asset = ref("");
+  const aId = ref(0);
   const postedBy = ref("");
   const datePosted = ref("");
   const end = ref("");
@@ -70,7 +71,8 @@
         if (!success) {
           throw new Error ("Something went wrong in displaying Work Order details");
         }
-        const { 
+        const {
+          assetId,
           title,
           startDate,
           endDate,
@@ -97,7 +99,7 @@
         serviceDescription.value = details;
         maintenanceId.value = maintenanceTypeId;
         serviceDocs.value = files;
-
+        aId.value = assetId;
       } catch (error) {
         if (error instanceof AxiosError) {
           const { message } = error.response;
@@ -116,6 +118,7 @@
   });
 
   onUnmounted(() => {
+    console.log(props.id);
     window.removeEventListener("keyup", handleUnmountComponent);
   });
 
@@ -193,6 +196,8 @@
                 </div>
                 <ServiceTable
                   :serviceData = "serviceDescription"
+                  :assetId = "aId"
+                  :workOrderId = "props.id"
                 />
               </div>
               <div v-else-if = "maintenanceId === 6">
@@ -200,34 +205,24 @@
                   <span class = "">Service Log:</span>
                 </div>
                 <ServiceLogInfo
+                  :assetId = "aId"
                   :serviceData = "serviceDescription"
                 />
-              </div>
-              <div class = "mt-1 flex grid grid-cols-1">
-                <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                  <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                    <span class = "">Service Documents</span>
+                <div class = "mt-1 flex grid grid-cols-1">
+                  <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+                    <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                      <span class = "">Service Documents</span>
+                    </div>
+                    <FileListing :serviceDocs = "serviceDocs"/>
+                    
                   </div>
-                  <FileListing :serviceDocs = "serviceDocs"/>
-                  
                 </div>
               </div>
-              
             </div>
             
           </div>
 
-          <div className = "flex justify-end m-4 p-6">
-            <Button
-              buttonText = "Submit"
-              buttonClass = "font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 border border-green-500 rounded dark:bg-slate-800 text-green-500 hover:bg-green-500 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50"
-              buttonType = "button"
-              :onClickEvent = "handleSubmit"
-              iconSetting = "fa-solid fa-paper-plane"
-              :isDisabled = "false"
-              buttonTitle = "Save Schedule"
-            />
-          </div>
+          <div className = "flex justify-end m-4 p-6"></div>
         </div>
       </div>
     </div>
