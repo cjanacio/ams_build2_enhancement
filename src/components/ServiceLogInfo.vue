@@ -1,16 +1,16 @@
 <script setup>
-  import { onMounted } from 'vue';
+  import FileListing from "./FileListing.vue";
   const props = defineProps({
     serviceData: {
       type: Array,
       required: true
+    },
+    workOrderRecall: {
+      type: Function,
+      required: false
     }
   });
-  
-  onMounted(() => {
-    console.log(props.serviceData);
-  });
-  
+
 </script>
 
 <template>
@@ -102,7 +102,7 @@
           </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
-            {{ props.serviceData[0].equipmentUsed }}
+            {{ props.serviceData[0].equipment }}
           </span>
         </div>
       </div>
@@ -140,6 +140,13 @@
         </div>
       </div>
     </div>
-    
+    <div class = "mt-1 flex grid grid-cols-1">
+        <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+          <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+            <span class = "">Service Documents</span>
+          </div>
+          <FileListing :serviceDocs = "props.serviceData[0].files"/>
+        </div>
+      </div>
   </div>
 </template>

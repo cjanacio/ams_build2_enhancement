@@ -125,10 +125,10 @@
         if (!performedBy.value) {
           throw new Error ("Performed By is required.");
         }
-        formData.append("supervisedBy", supervisedBy.value);
         if (!supervisedBy.value) {
           throw new Error ("Supervised By is required.");
         }
+        formData.append("supervisedBy", JSON.stringify(supervisedBy.value));
         formData.append("serviceStatus", serviceResult.value);
         if (!serviceResult.value) {
           throw new Error ("Service status is required.");

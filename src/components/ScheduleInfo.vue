@@ -6,7 +6,6 @@
   import Button from "./Button.vue";
   import ServiceTable from "./ServiceTable.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
-  import FileListing from "./FileListing.vue";
 
   const toast = useToast();
 
@@ -33,8 +32,7 @@
   const eventTitle = ref("");
   const frequencySched = ref("");
   const serviceDescription = ref([]);
-  const serviceDocs = ref([]);
-
+  const equipment = ref("");
   const handleUnmountComponent = (e) => {
     if (e.key === "Escape") {
       props.closeCallBack();
@@ -42,83 +40,86 @@
     }
   }
 
-  const handleSubmit = () => {
-    alert("Test");
+  const getWorkOrder = async () => {
+    try {
+      const id = props.id;
+      const payloadBody = {
+        id:id
+      };
+      const payloadHeader = {
+        "Content-Type":"application/json",
+        "Event-Key":"get-work-order-info",
+      }
+
+      const { data } = await axios.get(AMS_MODEL_PATH, {
+        params: payloadBody,
+        headers: payloadHeader,
+        data: {}
+      });
+
+      const { success, result } = data;
+      if (!success) {
+        throw new Error ("Something went wrong in displaying Work Order details");
+      }
+      const {
+        assetId,
+        title,
+        startDate,
+        endDate,
+        createdBy,
+        dateCreated,
+        assetType,
+        maintenanceType,
+        maintenanceTypeId,
+        frequencySchedule,
+        legend,
+        details,
+        equipmentUsed
+      } = result.workOrder;
+
+      eventTitle.value = title;
+      start.value = startDate;
+      end.value = endDate;
+      postedBy.value = createdBy;
+      datePosted.value = dateCreated;
+      asset.value = assetType;
+      maintenance.value = maintenanceType;
+      frequencySched.value = frequencySchedule;
+      color.value = legend;
+      serviceDescription.value = details;
+      maintenanceId.value = maintenanceTypeId;
+      equipment.value = equipmentUsed;
+      aId.value = assetId;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const { message, status } = error.response;
+        if (status === 503) {
+          location.reload();
+        } else {
+          window.location.href = `index.php?page=${ status }`;
+          toast.warning(message, {
+            icon: "fa-solid fa-triangle-exclamation",
+          });
+        }
+        
+      } else {
+        toast.warning(error.message, {
+          icon: "fa-solid fa-triangle-exclamation",
+        });
+      }
+    }
+    
   }
 
   onMounted(async () => {
     window.addEventListener("keyup", handleUnmountComponent);
     document.body.style.overflowY = "hidden";
     
-    const getWorkOrder = async () => {
-      try {
-        const id = props.id;
-        const payloadBody = {
-          id:id
-        };
-        const payloadHeader = {
-          "Content-Type":"application/json",
-          "Event-Key":"get-work-order-info",
-        }
-
-        const { data } = await axios.get(AMS_MODEL_PATH, {
-          params: payloadBody,
-          headers: payloadHeader,
-          data: {}
-        });
-
-        const { success, result } = data;
-        if (!success) {
-          throw new Error ("Something went wrong in displaying Work Order details");
-        }
-        const {
-          assetId,
-          title,
-          startDate,
-          endDate,
-          createdBy,
-          dateCreated,
-          assetType,
-          maintenanceType,
-          maintenanceTypeId,
-          frequencySchedule,
-          legend,
-          details,
-          files
-        } = result.workOrder;
-
-        eventTitle.value = title;
-        start.value = startDate;
-        end.value = endDate;
-        postedBy.value = createdBy;
-        datePosted.value = dateCreated;
-        asset.value = assetType;
-        maintenance.value = maintenanceType;
-        frequencySched.value = frequencySchedule;
-        color.value = legend;
-        serviceDescription.value = details;
-        maintenanceId.value = maintenanceTypeId;
-        serviceDocs.value = files;
-        aId.value = assetId;
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          const { message } = error.response;
-          toast.warning(message, {
-            icon: "fa-solid fa-triangle-exclamation",
-          });
-        } else {
-          toast.warning(error.message, {
-            icon: "fa-solid fa-triangle-exclamation",
-          });
-        }
-      }
-      
-    }
     await getWorkOrder();
   });
 
   onUnmounted(() => {
-    console.log(props.id);
+    console.log(serviceDescription);
     window.removeEventListener("keyup", handleUnmountComponent);
   });
 
@@ -198,28 +199,20 @@
                   :serviceData = "serviceDescription"
                   :assetId = "aId"
                   :workOrderId = "props.id"
+                  :workOrderRecall = "getWorkOrder"
                 />
               </div>
               <div v-else-if = "maintenanceId === 6">
                 <div class = "dark:text-slate-400 text-center font-bold text-sm uppercase my-2 mb-4">
-                  <span class = "">Service Log:</span>
+                  <span class = "">Service Log</span>
                 </div>
                 <ServiceLogInfo
                   :assetId = "aId"
                   :serviceData = "serviceDescription"
                 />
-                <div class = "mt-1 flex grid grid-cols-1">
-                  <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-                    <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                      <span class = "">Service Documents</span>
-                    </div>
-                    <FileListing :serviceDocs = "serviceDocs"/>
-                    
-                  </div>
-                </div>
+                
               </div>
             </div>
-            
           </div>
 
           <div className = "flex justify-end m-4 p-6"></div>

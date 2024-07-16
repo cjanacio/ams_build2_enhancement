@@ -19,12 +19,21 @@
     workOrderId: {
       type: Number,
       required: true
+    },
+    workOrderRecall: {
+      type: Function,
+      required: false
     }
   });
   const appendDetails = ref(false);
   const handleChildAppend = () => {
     appendDetails.value = !appendDetails.value;
   }
+
+  const hideChildState = () => {
+    appendDetails.value = false;
+  }
+
 </script>
 <template>
   <tr class = "border-b dark:bg-slate-700/70 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 transition ease-in-out delay-70 bg-slate-100">
@@ -47,8 +56,9 @@
     v-if = "appendDetails"
     :serviceDetails = "service"
     :assetId = "props.assetId"
-    :maintenanceType = "props.maintenanceTypeId"
     :serviceCount = "props.serviceCount"
     :workOrderId = "props.workOrderId"
+    @recall-work-order = "props.workOrderRecall"
+    @hide-child-state = "hideChildState"
   />
 </template>

@@ -36,6 +36,7 @@
     :class="inputClass"
     :autocomplete="'off'"
     :disabled="isDisabled"
+    autocomplete="off"
     v-if="inputType !== 'file'"
   />
   <input

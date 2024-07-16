@@ -122,11 +122,11 @@
   const handleFilterModal = () => {
     alert("filter");
   }
-  const handleScheduleInfoForm = (id) => {
+  const handleScheduleInfoForm = async (id) => {
     workOrderId.value = id;
     displaySchedule.value = !displaySchedule.value;
     document.body.style.overflowY = "visible";
-
+    events.value = await calendarInit();
   }
 
   const handleAddScheduleForm = () => {
@@ -167,9 +167,9 @@
   /* END METHODS MANAGEMENT */
 
   /* START VUE METHODS MANAGEMENT */
-  onMounted(async () => {
-    // events.value = await calendarInit();
-  });
+  // onMounted(async () => {
+  //   // events.value = await calendarInit();
+  // });
   /* END VUE METHODS MANAGEMENT */
   
 </script>

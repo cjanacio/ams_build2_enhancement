@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import ServiceTableRow from './ServiceTableRow.vue';
 const props = defineProps({
   serviceData: {
@@ -13,6 +12,10 @@ const props = defineProps({
   workOrderId: {
     type: Number,
     required: true
+  },
+  workOrderRecall: {
+    type: Function,
+    required: false
   }
 });
 
@@ -36,6 +39,7 @@ const props = defineProps({
         :assetId = "props.assetId"
         :serviceCount = "serviceData.length"
         :workOrderId = "props.workOrderId"
+        :workOrderRecall = "props.workOrderRecall"
       />
       <tr aria-colspan="3" v-else>
         <td class = "uppercase font-bold">No Work Order Service found.</td>

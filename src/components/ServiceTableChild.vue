@@ -19,10 +19,6 @@
       type: Number,
       required: true
     },
-    maintenanceType: {
-      type:Number,
-      required: true
-    },
     serviceCount: {
       type: Number,
       required: true
@@ -32,10 +28,11 @@
       required: true
     }
   });
-
+  const emit = defineEmits(['recall-work-order', "hide-child-state"]);
   const serviceDescriptionText = ref("");
   const handler = ref(0);
   const handlerOptions = ref([]);
+  const applyToEveryService = ref(false);
   const toArray = ref([props.serviceDetails]);
   
   const serviceResult = ref(0);
@@ -43,7 +40,11 @@
   const assetStatus = ref(0);
   const assetStatusOptions = ref([]);
   const performedBy = ref("");
-  const supervisedBy = ref("");
+  const supervisedBy = ref({
+    name: "",
+    mail: "",
+    account: ""
+  });
   const purchaseOrder = ref("");
   const incurredCost = ref("");
   const equipmentUsed = ref("");
@@ -58,9 +59,11 @@
 
   const handleSaveService = async () => {
     try {
-      const formData = new FormData();
+      const formData = new FormData();0
       const serviceId = props.serviceDetails.id;
+      formData.append("serviceId", serviceId);
       formData.append("handledBy", handler.value);
+      formData.append("applyToEveryService", applyToEveryService.value);
       if (!handler.value) {
         throw new Error ("Handled By is required.");
       }
@@ -68,21 +71,22 @@
       if (!performedBy.value) {
         throw new Error ("Performed By is required.");
       }
-      formData.append("supervisedBy", supervisedBy.value);
       if (!supervisedBy.value) {
         throw new Error ("Supervised By is required.");
       }
-      formData.append("serviceStatus", serviceResult.value);
+      formData.append("supervisedBy", JSON.stringify(supervisedBy.value));
       if (!serviceResult.value) {
         throw new Error ("Service status is required.");
       }
-      formData.append("assetStatus", assetStatus.value);
+      formData.append("serviceStatus", serviceResult.value);
       if (!assetStatus.value) {
         throw new Error ("Asset status is required.");
       }
+      formData.append("assetStatus", assetStatus.value);
       if (!serviceDescriptionText.value) {
         throw new Error ("Service Description textbox is required");
       }
+      formData.append("remarks", serviceDescriptionText.value);
       purchaseOrder.value && formData.append("purchaseOrder", purchaseOrder.value);
       incurredCost.value && formData.append("incurredCost", incurredCost.value);
       equipmentUsed.value && formData.append("equipmentUsed", equipmentUsed.value);
@@ -92,13 +96,41 @@
         formData.append(`docs${ index }`, file);
       });
       const auth = await authToken();
-
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        const { message } = error.response;
+      const { data } = await axios.post(
+        AMS_MODEL_PATH,
+        formData,
+        {
+          headers: {
+            "Content-Type":"multipart/form-data",
+            "Event-Key":"put-service-log",
+            "Authorization": auth
+          }
+        }
+      );
+      const { success, message } = data;
+      if (success) {
+        emit("recall-work-order");
+        toast.success(message, {
+          icon: "fa-solid fa-circle-check",
+        });
+        emit("hide-child-state");
+      } else {
         toast.warning(message, {
           icon: "fa-solid fa-triangle-exclamation",
         });
+        return false;
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const { message, status } = error.response;
+        if (status === 503) {
+          location.reload()
+        } else {
+          toast.warning(message, {
+            icon: "fa-solid fa-triangle-exclamation",
+          });
+          window.location.href = `index.php?page=${ status }`;
+        }
       } else {
         toast.warning(error.message, {
           icon: "fa-solid fa-triangle-exclamation",
@@ -135,7 +167,14 @@
         assetStatusOptions.value = result.assetStatus;
         assetStatus.value = result.assetStatus[0].id;
       } catch (error) {
-        console.log(error);
+        if (error instanceof AxiosError) {
+          const { status } = error.response;
+          if (status === 503) {
+            location.reload();
+          } else {
+            window.location.href = `index.php?page=${ status }`;
+          }
+        }
       }
     }
     await getPredefinedData();
@@ -160,12 +199,12 @@
           v-model:serviceResult = "serviceResult"
           v-model:assetStatus = "assetStatus"
           v-model:serviceDescriptionText = "serviceDescriptionText"
+          v-model:applyToEveryService = "applyToEveryService"
           @attach-file = "handleFileAttachment"
           :serviceResultOptions = "serviceResultOptions"
           :handlerOptions = "handlerOptions"
           :assetStatusOptions = "assetStatusOptions"
           :serviceDocs = "serviceDocs"
-          :maintenanceType = "props.maintenanceType"
           :serviceCount = "props.serviceCount"
         />
         <div className = "flex justify-end m-4 p-6">
@@ -182,21 +221,12 @@
       </div>
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit p-4" v-else-if = "serviceDetails.serviceResult === 'Closed'">
         <div class = "dark:text-slate-400 text-center font-bold text-sm uppercase my-2 mb-4">
-          <span class = "">Service Log:</span>
+          <span class = "">Service Log</span>
         </div>
         <ServiceLogInfo
-          :assetId = "props.assetId"
           :serviceData = "toArray"
         />
-        <div class = "mt-1 flex grid grid-cols-1">
-          <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-            <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-              <span class = "">Service Documents</span>
-            </div>
-            <FileListing :serviceDocs = "serviceDocs"/>
-            
-          </div>
-        </div>
+        
       </div>
     </td>
   </tr>
