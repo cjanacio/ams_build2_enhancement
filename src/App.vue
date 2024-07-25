@@ -12,9 +12,11 @@
   import AddSchedule from './components/AddSchedule.vue';
   import ScheduleInfo from './components/ScheduleInfo.vue';
   import Button from './components/Button.vue';
+  import TableScheduleView from './components/TableScheduleView.vue';
   __ENV__ === "DEV" && window.location.assign(`${ PARAM_URL }#1&1&1`);  /* DEV PURPOSES */
 
   /* START STATE MANAGEMENT */
+  localStorage.setItem("view-type-local", localStorage.getItem("view-type-local") !== null && localStorage.getItem("view-type-local") !== '' ? localStorage.getItem("view-type-local") : "Calendar");
   const parentClass = ref("bg-rob-mall-2 bg-white bg-no-repeat bg-local bg-right bg-contain dark:bg-slate-800/70 dark:bg-rob-mall-5 w-full");
   const pagePath = ref("Asset Monitoring System");
   const userName = ref("Sample User Name");
@@ -29,6 +31,7 @@
   const filterTo = ref(""); //for calendar vue
   const periodFrom = ref(""); //for adding service schedule
   const periodTo = ref(""); //for adding service schedule
+  const dumpResult = ref([]);
 
   const calendarPlugins = ref([
     dayGridPlugin,
@@ -116,12 +119,22 @@
     }
   });
 
+  
+  const viewType = ref(localStorage.getItem("view-type-local"));
+  viewType.value === "Table" 
+  const handleViewType = async () => {
+    localStorage.setItem("schedule-page", 1);
+    localStorage.setItem("view-type-local", viewType.value);
+    if (viewType.value === "Table") dumpResult.value = await calendarInit(); 
+  }
+
   /* END STATE MANAGEMENT */
 
   /* START METHODS MANAGEMENT */
   const handleFilterModal = () => {
     alert("filter");
   }
+
   const handleScheduleInfoForm = async (id) => {
     workOrderId.value = id;
     displaySchedule.value = !displaySchedule.value;
@@ -167,9 +180,24 @@
   /* END METHODS MANAGEMENT */
 
   /* START VUE METHODS MANAGEMENT */
-  // onMounted(async () => {
-  //   // events.value = await calendarInit();
-  // });
+  onMounted(async () => {
+    if (localStorage.getItem("view-type-local") === "Table") {
+      const currentDate = new Date();
+      const from = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+
+      // Get the last day of the current month
+      const to = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const formattedStart = `${
+        from.getFullYear()}/${String(from.getMonth()).padStart(2, '0')}/${String(from.getDate()).padStart(2, '0')
+      }`;
+      const formattedEnd = `${
+        to.getFullYear()}/${String(to.getMonth() + 1).padStart(2, '0')}/${String(to.getDate()).padStart(2, '0')
+      }`;
+      filterFrom.value = formattedStart;
+      filterTo.value = formattedEnd;
+      dumpResult.value = await calendarInit();
+    }
+  });
   /* END VUE METHODS MANAGEMENT */
   
 </script>
@@ -196,26 +224,42 @@
           :userName = "userName"
         />
       </div>
-      <section class = "bg-rob-mall bg-white bg-fixed bg-no-repeat bg-left dark:bg-no-bg dark:bg-slate-700/50 min-w-screen min-h-screen w-full">
+      <section class = "bg-rob-mall bg-white bg-fixed bg-no-repeat bg-left dark:bg-no-bg dark:bg-slate-700/50 min-w-screen min-h-dvh w-full">
         <div class = "mb-20" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
           <div class = "p-4 bg-fixed bg-no-repeat dark:bg-no-bg flex grid grid-cols-1 justify-center w-full">
             <div class = "rounded shadow-2xl shadow-gray-800 p-4 bg-white dark:bg-slate-800/70 dark:text-white">
-              <Button
-                buttonText = "Filter Calendar"
-                buttonClass = "font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full border border-sky-400 sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 rounded dark:bg-slate-800 text-sky-400 hover:bg-sky-400 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50 mb-4"
-                buttonType = "button"
-                :onClickEvent = "handleFilterModal"
-                iconSetting = "fa-solid fa-sliders"
-                :isDisabled = "false"
-                buttonTitle = "Modify the Calendar's feed to your needs"
-              />
-              <FullCalendar ref = "serviceCalendar" :options = "calendarOptions">
-                <template v-slot:eventContent='arg'>
-                  <div class = "px-1.5 hover:cursor-pointer font-medium text-ellipsis overflow-hidden">
-                    {{ arg.event.title }}
-                  </div>
-                </template>
-              </FullCalendar>
+              <div class = "flex grid grid-cols-1 mb-4">
+                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                  <span class = "">View Type</span>
+                </div>
+                <select v-model = "viewType" @change = "handleViewType" class = 'text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full sm:w-full md:w-64 lg:w-64 xl:w-64 2xl:w-64 p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white'>
+                  <option>Calendar</option>
+                  <option>Table</option>
+                </select>
+              </div>
+              <div v-if = "viewType === 'Calendar'" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
+                <Button
+                  buttonText = "Filter Calendar"
+                  buttonClass = "font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full border border-sky-400 sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 rounded dark:bg-slate-800 text-sky-400 hover:bg-sky-400 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50 mb-4"
+                  buttonType = "button"
+                  :onClickEvent = "handleFilterModal"
+                  iconSetting = "fa-solid fa-sliders"
+                  :isDisabled = "false"
+                  buttonTitle = "Modify the Calendar's feed to your needs"
+                />
+                <FullCalendar ref = "serviceCalendar" :options = "calendarOptions">
+                  <template v-slot:eventContent='arg'>
+                    <div class = "px-1.5 hover:cursor-pointer font-medium text-ellipsis overflow-hidden">
+                      {{ arg.event.title }}
+                    </div>
+                  </template>
+                </FullCalendar>
+              </div>
+              <div v-else-if = "viewType === 'Table'" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
+                <TableScheduleView
+                  :response = "dumpResult"
+                />
+              </div>
             </div>
           </div>
         </div>

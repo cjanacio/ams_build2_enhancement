@@ -3,7 +3,6 @@
   import { useToast } from "vue-toastification";
   import { AMS_MODEL_PATH } from '../assets/global.js'
   import { ref, onMounted, onUnmounted } from 'vue';
-  import Button from "./Button.vue";
   import ServiceTable from "./ServiceTable.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
 
@@ -33,6 +32,8 @@
   const frequencySched = ref("");
   const serviceDescription = ref([]);
   const equipment = ref("");
+  const assetStatus = ref("");
+  const assetStatusColor = ref("");
   const handleUnmountComponent = (e) => {
     if (e.key === "Escape") {
       props.closeCallBack();
@@ -74,7 +75,9 @@
         frequencySchedule,
         legend,
         details,
-        equipmentUsed
+        equipmentUsed,
+        statusDescription,
+        statusDescriptionColor
       } = result.workOrder;
 
       eventTitle.value = title;
@@ -90,6 +93,8 @@
       maintenanceId.value = maintenanceTypeId;
       equipment.value = equipmentUsed;
       aId.value = assetId;
+      assetStatus.value = statusDescription;
+      assetStatusColor.value = statusDescriptionColor;
     } catch (error) {
       if (error instanceof AxiosError) {
         const { message, status } = error.response;
@@ -119,7 +124,6 @@
   });
 
   onUnmounted(() => {
-    console.log(serviceDescription);
     window.removeEventListener("keyup", handleUnmountComponent);
   });
 
@@ -143,6 +147,18 @@
           <div class = "mb-2 border-b-2 dark:border-gray-600/50 py-6 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
             <span class = "text-2xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl 2xl:text-2xl text-sky-500 uppercase p-8 ">Work&nbsp;Order</span>
           </div>
+          <div class = "flex grid grid-cols-1 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+            <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
+                <span class = "">Work Order Overall Asset Status</span>
+              </div>
+              <div class = "text-left">
+                <span class="dark:text-slate-200 font-bold text-left uppercase " :style='{ color: assetStatusColor }'>
+                  {{ assetStatus }}
+                </span>
+              </div>
+            </div>
+          </div>
           <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
@@ -163,7 +179,7 @@
               
             </div>
           </div>
-          <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8 ">
+          <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                 <span class = "">Start:</span>&nbsp;<span class="dark:text-slate-200 font-bold"><br/>{{ start }}</span>

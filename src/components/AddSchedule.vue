@@ -6,7 +6,6 @@
   import Button from "./Button.vue";
   import Input from "./Input.vue";
   import Select from "./Select.vue";
-  import TextArea from "./TextArea.vue";
   import AddServiceLog from './AddServiceLog.vue';
   const toast = useToast();
 

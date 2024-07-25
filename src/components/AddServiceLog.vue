@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from "vue";
   import { useToast } from "vue-toastification";
-  import TextArea from "./TextArea.vue";
+  import InputTextArea from "./InputTextArea.vue";
   import Select from "./Select.vue";
   import Input from "./Input.vue";
   import axios from "axios";
@@ -313,7 +313,7 @@
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
           <span class = "">Service Description</span>&nbsp;<span class="text-red-500">*</span>
         </div>
-        <TextArea
+        <InputTextArea
         textAreaClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white h-32"
         v-model = "serviceDescriptionText"
         />

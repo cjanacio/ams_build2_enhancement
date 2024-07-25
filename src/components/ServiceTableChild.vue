@@ -1,10 +1,8 @@
 <script setup>
   import { ref, onMounted } from "vue";
   import Button from "./Button.vue";
-  import Input from "./Input.vue";
   import AddServiceLog from "./AddServiceLog.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
-  import FileListing from "./FileListing.vue";
   import axios, { AxiosError } from 'axios';
   import { authToken, AMS_MODEL_PATH } from '../assets/global.js'
   import { useToast } from "vue-toastification";
@@ -59,7 +57,7 @@
 
   const handleSaveService = async () => {
     try {
-      const formData = new FormData();0
+      const formData = new FormData();
       const serviceId = props.serviceDetails.id;
       formData.append("serviceId", serviceId);
       formData.append("handledBy", handler.value);

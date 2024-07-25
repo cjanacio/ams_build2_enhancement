@@ -15,6 +15,7 @@
 
 <template>
   <div class=''>
+    
     <div class = "mt-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1">
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
@@ -122,7 +123,7 @@
           </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
-            {{ props.serviceData[0].statusDescription }}
+            {{ props.serviceData[0].detailsStatus }}
           </span>
         </div>
       </div>
