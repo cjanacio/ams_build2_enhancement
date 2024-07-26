@@ -150,6 +150,7 @@
     displayAddSchedule.value = false;
     document.body.style.overflowY = "visible";
     events.value = await calendarInit();
+    dumpResult.value = events.value;
   }
 
   const calendarInit = async () => {
@@ -175,7 +176,6 @@
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-    
   }
   /* END METHODS MANAGEMENT */
 
@@ -256,9 +256,33 @@
                 </FullCalendar>
               </div>
               <div v-else-if = "viewType === 'Table'" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
-                <TableScheduleView
-                  :response = "dumpResult"
+                
+                <Button
+                  buttonText = "Filter Table"
+                  buttonClass = "mr-2 font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full border border-sky-400 sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 rounded dark:bg-slate-800 text-sky-400 hover:bg-sky-400 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50 mb-4"
+                  buttonType = "button"
+                  :onClickEvent = "handleFilterModal"
+                  iconSetting = "fa-solid fa-sliders"
+                  :isDisabled = "false"
+                  buttonTitle = "Modify the Table's feed to your needs"
                 />
+                <Button
+                  buttonText = "Add Schedule"
+                  buttonClass = "font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full border border-green-400 sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 rounded dark:bg-slate-800 text-green-400 hover:bg-green-400 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50 mb-4"
+                  buttonType = "button"
+                  :onClickEvent = "handleAddScheduleForm"
+                  iconSetting = "fa-solid fa-sliders"
+                  :isDisabled = "false"
+                  buttonTitle = "Modify the Table's feed to your needs"
+                />
+                <div class="mx-auto">
+                  <div class="overflow-x-auto">
+                    <TableScheduleView
+                      :response = "dumpResult"
+                      @display-info = "handleScheduleInfoForm"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
