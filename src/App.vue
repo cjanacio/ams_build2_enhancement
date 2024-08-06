@@ -3,8 +3,8 @@
   import axios from 'axios';
   import tippy, { followCursor } from 'tippy.js';
   import 'tippy.js/dist/tippy.css';
-  import { __ENV__, PARAM_URL, AMS_MODEL_PATH } from "./assets/global.js";
-  import { ref, onMounted } from 'vue';
+  import { authToken, __ENV__, PARAM_URL, AMS_MODEL_PATH } from "./assets/global.js";
+  import { ref, onMounted, onUnmounted } from 'vue';
   import FullCalendar from '@fullcalendar/vue3';
   import dayGridPlugin from '@fullcalendar/daygrid';
   import interactionPlugin from '@fullcalendar/interaction';
@@ -13,6 +13,7 @@
   import ScheduleInfo from './components/ScheduleInfo.vue';
   import Button from './components/Button.vue';
   import TableScheduleView from './components/TableScheduleView.vue';
+  import FilterDisplay from './components/FilterDisplay.vue';
   __ENV__ === "DEV" && window.location.assign(`${ PARAM_URL }#1&1&1`);  /* DEV PURPOSES */
 
   /* START STATE MANAGEMENT */
@@ -27,11 +28,17 @@
   const split = params.split("&"); 
   const assetId = ref(split[0]);
   const workOrderId = ref(0);
-  const filterFrom = ref(""); //for calendar vue
-  const filterTo = ref(""); //for calendar vue
   const periodFrom = ref(""); //for adding service schedule
   const periodTo = ref(""); //for adding service schedule
   const dumpResult = ref([]);
+  const displayTableFilter = ref(false);
+  const displayCalendarFilter = ref(false);
+  const filterFrom = ref(""); //for table/calendar
+  const filterTo = ref(""); //for table/calendar
+  const filterFrequency = ref("");
+  const filterType = ref("");
+  const filterStatus = ref("");
+  const predefined = ref([]);
 
   const calendarPlugins = ref([
     dayGridPlugin,
@@ -112,7 +119,7 @@
       }`;
       periodFrom.value = start;
       periodTo.value = end;
-      handleAddScheduleForm()
+      handleAddScheduleForm();
     },
     eventClick: (info) => {
       handleScheduleInfoForm(info.event.id);
@@ -121,10 +128,13 @@
 
   
   const viewType = ref(localStorage.getItem("view-type-local"));
-  viewType.value === "Table" 
+  const identifyView = ref(viewType.value === 'Table' ? displayTableFilter : displayCalendarFilter);
   const handleViewType = async () => {
+    displayTableFilter.value = false;
+    displayCalendarFilter.value = false;
     localStorage.setItem("schedule-page", 1);
     localStorage.setItem("view-type-local", viewType.value);
+    
     if (viewType.value === "Table") dumpResult.value = await calendarInit(); 
   }
 
@@ -132,7 +142,27 @@
 
   /* START METHODS MANAGEMENT */
   const handleFilterModal = () => {
-    alert("filter");
+    // displayTableFilter.value = false;
+    // displayCalendarFilter.value = false;
+    if (viewType.value === "Table") {
+      const currentDate = new Date();
+      const from = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+      const to = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const formattedStart = `${
+        from.getFullYear()}-${String(from.getMonth()).padStart(2, '0')}-${String(from.getDate()).padStart(2, '0')
+        }`;
+        const formattedEnd = `${
+          to.getFullYear()}-${String(to.getMonth() + 1).padStart(2, '0')}-${String(to.getDate()).padStart(2, '0')
+          }`;
+          filterFrom.value = formattedStart;
+          filterTo.value = formattedEnd;
+          displayTableFilter.value = true;
+          identifyView.value = displayTableFilter.value;
+    } else if (viewType.value === "Calendar") {
+      displayCalendarFilter.value = true;
+      identifyView.value = displayCalendarFilter.value;
+    }
+    console.log(identifyView.value)
   }
 
   const handleScheduleInfoForm = async (id) => {
@@ -143,7 +173,7 @@
   }
 
   const handleAddScheduleForm = () => {
-    displayAddSchedule.value = !displayAddSchedule.value
+    displayAddSchedule.value = !displayAddSchedule.value;
   }
 
   const handleCloseAddScheduleForm = async () => {
@@ -155,32 +185,93 @@
 
   const calendarInit = async () => {
     try {
+      const page = viewType.value === "Table" ? localStorage.getItem("schedule-page") : false
       const id = assetId.value;
       const dateFrom = filterFrom.value;
       const dateTo = filterTo.value;
+      const type = parseInt(filterType.value);
+      const frequency = parseInt(filterFrequency.value);
+      const serviceResult = parseInt(filterStatus.value);
+      const payLoad = {
+        id:id,
+        dateFrom:dateFrom,
+        dateTo:dateTo
+      }
+      if (type !== 0) payLoad.type = type;
+      if (frequency !== 0) payLoad.frequency = frequency;
+      if (serviceResult !== 0) payLoad.serviceResult = serviceResult;
+
+      if (page !== false) payLoad.page = page;
       const { data } = await axios.get(AMS_MODEL_PATH, {
-        params: {
-          id:id,
-          dateFrom:dateFrom,
-          dateTo:dateTo
-        },
+        params: payLoad,
         headers: {
           "Content-Type":"application/json",
           "Event-Key":"get-work-order-schedule"
         },
         data: {}
       });
-      
+      filterType.value = type;
+      filterFrequency.value = frequency;
+      filterStatus.value = serviceResult;
       const { result } = data;
       return result;
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   }
+
+  const getPredefinedData = async () => {
+    try {
+      const token = await authToken();
+      const payloadHeader = {
+        "Content-Type":"application/json",
+        "Authorization": token,
+        "Event-Key": "get-predefined-data"
+      }
+      const { data } = await axios.get(AMS_MODEL_PATH, {
+        params: {
+          id:assetId.value
+        },
+        headers: payloadHeader,
+        data: {}
+      });
+      const { result } = data;
+      predefined.value = result;
+    } catch (error) {
+      console.log(error);
+    }
+  }
   /* END METHODS MANAGEMENT */
 
   /* START VUE METHODS MANAGEMENT */
+  const handleScroll = () => {
+    if (localStorage.getItem("view-type-local") === "Table") {
+      const bottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight;
+      if (bottom) {
+        console.log('User has reached the bottom of the page');
+      }
+    }
+  };
+  
+  const handleCloseFilter = () => {
+    if (viewType.value === "Table") {
+      displayTableFilter.value = false;
+      identifyView.value = displayTableFilter.value;
+    } else if (viewType.value === "Calendar") {
+      displayCalendarFilter.value = false;
+      identifyView.value = displayCalendarFilter.value;
+    }
+  }
+
+  const handleFilter = async () => {
+    viewType.value === 'Table'
+    ? dumpResult.value = await calendarInit()
+    : events.value = await calendarInit()
+  }
+
   onMounted(async () => {
+    window.addEventListener('scroll', handleScroll);
+    await getPredefinedData();
     if (localStorage.getItem("view-type-local") === "Table") {
       const currentDate = new Date();
       const from = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
@@ -198,6 +289,9 @@
       dumpResult.value = await calendarInit();
     }
   });
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+  });
   /* END VUE METHODS MANAGEMENT */
   
 </script>
@@ -210,10 +304,27 @@
   />
   <AddSchedule
     v-if = "displayAddSchedule"
-    :closeCallBack = "handleCloseAddScheduleForm"
+    @close-callback = "handleCloseAddScheduleForm"
     :start = "periodFrom"
     :end = "periodTo"
     :id = "parseInt(assetId)"
+    :predefined = "predefined"
+  />
+  <!-- <FilterCalendar
+    @close-callback = "handleCloseCalendarFilter"
+    v-model:
+  /> -->
+  <FilterDisplay
+    v-if = "identifyView"
+    @close-callback = "handleCloseFilter"
+    @handle-filter-submission = "handleFilter"
+    :predefined = "predefined"
+    :viewType="viewType"
+    v-model:filterFrom = "filterFrom"
+    v-model:filterTo = "filterTo"
+    v-model:filterFrequency = "filterFrequency"
+    v-model:filterType = "filterType"
+    v-model:filterStatus = "filterStatus"
   />
   <section class = "h-dvh sm:h-dvh md:h-dvh lg:h-screen xl:h-screen 2xl:h-screen" :style="animationStyle">
     <div class = "px-0 sm:px-0 md:px-5 lg:px-6 py-0">
@@ -226,7 +337,7 @@
       </div>
       <section class = "bg-rob-mall bg-white bg-fixed bg-no-repeat bg-left dark:bg-no-bg dark:bg-slate-700/50 min-w-screen min-h-dvh w-full">
         <div class = "mb-20" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
-          <div class = "p-4 bg-fixed bg-no-repeat dark:bg-no-bg flex grid grid-cols-1 justify-center w-full">
+          <div class = "lg:p-4 xl:p-4 2xl:p-4 bg-fixed bg-no-repeat dark:bg-no-bg flex grid grid-cols-1 justify-center w-full">
             <div class = "rounded shadow-2xl shadow-gray-800 p-4 bg-white dark:bg-slate-800/70 dark:text-white">
               <div class = "flex grid grid-cols-1 mb-4">
                 <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
@@ -266,6 +377,7 @@
                   :isDisabled = "false"
                   buttonTitle = "Modify the Table's feed to your needs"
                 />
+                
                 <Button
                   buttonText = "Add Schedule"
                   buttonClass = "font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full border border-green-400 sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 rounded dark:bg-slate-800 text-green-400 hover:bg-green-400 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50 mb-4"

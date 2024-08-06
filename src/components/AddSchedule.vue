@@ -8,12 +8,8 @@
   import Select from "./Select.vue";
   import AddServiceLog from './AddServiceLog.vue';
   const toast = useToast();
-
+  
   const props = defineProps({
-    closeCallBack: {
-      type: Function,
-      required: true
-    },
     start: {
       type: String,
       required: true,
@@ -25,8 +21,15 @@
     id: {
       type: Number,
       required: true,
+    },
+    predefined: {
+      type: Object,
+      required: true
     }
   });
+  const emits = defineEmits([
+    'close-callback'
+  ]);
   const assetId = ref(0);
   const woTitle = ref("");
   const startDate = ref("");
@@ -223,13 +226,12 @@
 
   const handleCloseAddScheduleForm = (e) => {
     if (e.key === "Escape") {
-      props.closeCallBack();
+      emits('close-callback');
       document.body.style.overflowY = "auto"
     }
   }
 
   const handleFileAttachment = (filesAttached) => {
-    console.log(filesAttached);
     serviceDocs.value = [];
     serviceDocs.value.push(...filesAttached);
   }
@@ -240,45 +242,20 @@
     startDate.value = props.start;
     endDate.value = props.end;
     assetId.value = props.id;
-
-    const getPredefinedData = async () => {
-      try {
-        const token = await authToken();
-        const payloadHeader = {
-          "Content-Type":"application/json",
-          "Authorization": token,
-          "Event-Key": "get-predefined-data"
-        }
-        const { data } = await axios.get(AMS_MODEL_PATH, {
-          params: {
-            id:assetId.value
-          },
-          headers: payloadHeader,
-          data: {}
-        });
-
-        const { result } = data;
-        frequencyOptions.value = result.frequencies;
-        frequency.value = result.frequencies[0].id;
-        maintenanceOptions.value = result.maintenanceType;
-        maintenance.value = result.maintenanceType[0].id;
-        serviceDescriptionOptions.value = result.frequencies[0].serviceDescription;
-        serviceDescription.value = result.frequencies[0].serviceDescription;
-        recurrence.value = parseInt(maintenance.value) === 3 ? props.start : "";
-        handlerOptions.value = result.personnel;
-        handler.value = result.personnel[0].id;
-        serviceResultOptions.value = result.serviceResult;
-        serviceResult.value = result.serviceResult[0].id;
-        assetStatusOptions.value = result.assetStatus;
-        assetStatus.value = result.assetStatus[0].id;
-
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    await getPredefinedData();
-    handleFrequencyRule(props.start);
-
+    frequencyOptions.value = props.predefined.frequencies;
+    frequency.value = props.predefined.frequencies[0].id;
+    maintenanceOptions.value = props.predefined.maintenanceType;
+    maintenance.value = props.predefined.maintenanceType[0].id;
+    serviceDescriptionOptions.value = props.predefined.frequencies[0].serviceDescription;
+    serviceDescription.value = props.predefined.frequencies[0].serviceDescription;
+    recurrence.value = parseInt(maintenance.value) === 3 ? props.start : "";
+    handlerOptions.value = props.predefined.personnel;
+    handler.value = props.predefined.personnel[0].id;
+    serviceResultOptions.value = props.predefined.serviceResult;
+    serviceResult.value = props.predefined.serviceResult[0].id;
+    assetStatusOptions.value = props.predefined.assetStatus;
+    assetStatus.value = props.predefined.assetStatus[0].id;
+    // handleFrequencyRule(props.start);
   });
 
   onUnmounted(() => {
@@ -295,7 +272,7 @@
             <button
               class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-center text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
               type = "button"
-              @click = "closeCallBack"
+              @click = "emits('close-callback')"
             >
               <i class = "fa fa-times"></i>
             </button>

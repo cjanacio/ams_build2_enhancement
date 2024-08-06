@@ -13,7 +13,7 @@ const emit = defineEmits(["display-info"]);
 <template>
   <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400">
     <thead class="rounded-t-lg border-b border-gray-700 shadow-lg text-xs text-gray-600 uppercase bg-green-300 dark:bg-slate-800/70 dark:text-green-400 text-center">
-      <tr class = "rounded">
+      <tr class = "p-5 bg-green-300 dark:bg-slate-700 z-10 rounded">
         <th scope="col" class="p-5">Frequency</th>
         <th scope="col" class="p-5">Title</th>
         <th scope="col" class="p-5">Type</th>
