@@ -172,7 +172,7 @@
       toast.success(message, {
         icon: "fa-solid fa-circle-check",
       });
-      props.closeCallBack();
+      emits('close-callback');
     } catch (error) {
       if (error instanceof AxiosError) {
         const { message } = error.response;

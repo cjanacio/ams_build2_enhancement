@@ -28,6 +28,7 @@ const emit = defineEmits(["display-info"]);
       key = "schedule.id"
       class = "p-2 w-full bg-slate-100 border-b dark:bg-slate-800/70 dark:border-slate-700 hover:cursor-pointer dark:hover:bg-slate-700/70 hover:bg-slate-200"
       @click = "emit('display-info', schedule.id)"
+      :style="{ animation: '2s ease 0s 1 normal none running fadeIn' }"
       >
         <td class = "px-4 py-4 font-bold" :style = "{ color: schedule.backgroundColor }">{{ schedule.frequency }}</td>
         <td class = "px-4 py-4 font-bold" >{{ schedule.title }}</td>

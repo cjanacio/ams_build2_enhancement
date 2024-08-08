@@ -39,6 +39,13 @@
   const filterType = ref("");
   const filterStatus = ref("");
   const predefined = ref([]);
+  const viewType = ref(localStorage.getItem("view-type-local"));
+  const identifyView = ref(viewType.value === 'Table' ? displayTableFilter : displayCalendarFilter);
+  const isAllDisplayed = ref(false);
+  const paginationStatus = ref("Loading more record.. Please wait..");
+  const page = ref(0);
+  const debounceTimer = ref(1000);
+  const invokeScrolling = ref();
 
   const calendarPlugins = ref([
     dayGridPlugin,
@@ -125,14 +132,10 @@
       handleScheduleInfoForm(info.event.id);
     }
   });
-
   
-  const viewType = ref(localStorage.getItem("view-type-local"));
-  const identifyView = ref(viewType.value === 'Table' ? displayTableFilter : displayCalendarFilter);
   const handleViewType = async () => {
     displayTableFilter.value = false;
     displayCalendarFilter.value = false;
-    localStorage.setItem("schedule-page", 1);
     localStorage.setItem("view-type-local", viewType.value);
     
     if (viewType.value === "Table") dumpResult.value = await calendarInit(); 
@@ -185,23 +188,28 @@
 
   const calendarInit = async () => {
     try {
-      const page = viewType.value === "Table" ? localStorage.getItem("schedule-page") : false
+      viewType.value === "Table"
+      ? page.value++
+      : false;
+
       const id = assetId.value;
       const dateFrom = filterFrom.value;
       const dateTo = filterTo.value;
       const type = parseInt(filterType.value);
       const frequency = parseInt(filterFrequency.value);
       const serviceResult = parseInt(filterStatus.value);
+      const view = viewType.value;
       const payLoad = {
         id:id,
         dateFrom:dateFrom,
-        dateTo:dateTo
+        dateTo:dateTo,
+        viewType:view
       }
-      if (type !== 0) payLoad.type = type;
-      if (frequency !== 0) payLoad.frequency = frequency;
-      if (serviceResult !== 0) payLoad.serviceResult = serviceResult;
+      if (type !== 0 && !isNaN(type)) payLoad.type = type;
+      if (frequency !== 0 && !isNaN(frequency)) payLoad.frequency = frequency;
+      if (serviceResult !== 0 && !isNaN(serviceResult)) payLoad.serviceResult = serviceResult;
 
-      if (page !== false) payLoad.page = page;
+      if (page.value !== false) payLoad.page = page.value;
       const { data } = await axios.get(AMS_MODEL_PATH, {
         params: payLoad,
         headers: {
@@ -213,10 +221,12 @@
       filterType.value = type;
       filterFrequency.value = frequency;
       filterStatus.value = serviceResult;
-      const { result } = data;
+      const { result, isAll } = data;
+      paginationStatus.value = isAll === true ? "All schedules are displayed" : "Loading more record.. Please wait..";
+      isAllDisplayed.value = isAll === true ? true : false;
       return result;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error.message);
     }
   }
 
@@ -244,11 +254,18 @@
   /* END METHODS MANAGEMENT */
 
   /* START VUE METHODS MANAGEMENT */
-  const handleScroll = () => {
+  const handleScroll = async () => {
+    
     if (localStorage.getItem("view-type-local") === "Table") {
-      const bottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight;
+      const bottom = window.innerHeight + window.scrollY >= (document.documentElement.scrollHeight - 1);
       if (bottom) {
-        console.log('User has reached the bottom of the page');
+        if (isAllDisplayed.value !== true) {
+          clearTimeout(invokeScrolling.value);
+          invokeScrolling.value = setTimeout(async () => {
+            const holder = await calendarInit();
+            dumpResult.value = [...dumpResult.value, ...holder];
+          }, debounceTimer.value);
+        }
       }
     }
   };
@@ -261,6 +278,7 @@
       displayCalendarFilter.value = false;
       identifyView.value = displayCalendarFilter.value;
     }
+    document.body.style.overflowY = "visible";
   }
 
   const handleFilter = async () => {
@@ -269,7 +287,16 @@
     : events.value = await calendarInit()
   }
 
+  const customScrollBehavior = (x, y) => {
+    window.scroll({
+      top: x,
+      left: y,
+      behavior: 'smooth'
+    });
+  }
+
   onMounted(async () => {
+    customScrollBehavior(50, 100);
     window.addEventListener('scroll', handleScroll);
     await getPredefinedData();
     if (localStorage.getItem("view-type-local") === "Table") {
@@ -366,7 +393,7 @@
                   </template>
                 </FullCalendar>
               </div>
-              <div v-else-if = "viewType === 'Table'" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
+              <div class = "mb-20" v-else-if = "viewType === 'Table'" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
                 
                 <Button
                   buttonText = "Filter Table"
@@ -394,6 +421,11 @@
                       @display-info = "handleScheduleInfoForm"
                     />
                   </div>
+                </div>
+                <div class = "w-full text-center sm:text-center md:text-left lg:text-left xl:text-left 2xl:text-left italic mt-4 text-xs uppercase">
+                  <span class = "dark:text-slate-200 text-slate-800">
+                    <i v-if = "isAllDisplayed" class = "text-green-400 fa-regular fa-circle-check">&nbsp;</i>{{ paginationStatus }}
+                  </span>
                 </div>
               </div>
             </div>
