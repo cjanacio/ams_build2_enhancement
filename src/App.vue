@@ -109,7 +109,7 @@
       }`;
       filterFrom.value = start;
       filterTo.value = end;
-      events.value = await calendarInit();
+      events.value = await calendarInit(0);
     },
     selectMirror: true,
     dayMaxEvents: true,
@@ -138,7 +138,7 @@
     displayCalendarFilter.value = false;
     localStorage.setItem("view-type-local", viewType.value);
     
-    if (viewType.value === "Table") dumpResult.value = await calendarInit(); 
+    if (viewType.value === "Table") dumpResult.value = await calendarInit(0); 
   }
 
   /* END STATE MANAGEMENT */
@@ -172,7 +172,7 @@
     workOrderId.value = id;
     displaySchedule.value = !displaySchedule.value;
     document.body.style.overflowY = "visible";
-    events.value = await calendarInit();
+    events.value = await calendarInit(0);
   }
 
   const handleAddScheduleForm = () => {
@@ -182,14 +182,17 @@
   const handleCloseAddScheduleForm = async () => {
     displayAddSchedule.value = false;
     document.body.style.overflowY = "visible";
-    events.value = await calendarInit();
+    events.value = await calendarInit(0);
     dumpResult.value = events.value;
   }
 
-  const calendarInit = async () => {
+  const calendarInit = async (x) => { //x = page
     try {
-      viewType.value === "Table"
-      ? page.value++
+      x = parseInt(x);
+      page.value = viewType.value === "Table"
+      ? x === 0
+        ? x += 1
+        : page.value
       : false;
 
       const id = assetId.value;
@@ -262,7 +265,7 @@
         if (isAllDisplayed.value !== true) {
           clearTimeout(invokeScrolling.value);
           invokeScrolling.value = setTimeout(async () => {
-            const holder = await calendarInit();
+            const holder = await calendarInit(page.value);
             dumpResult.value = [...dumpResult.value, ...holder];
           }, debounceTimer.value);
         }
@@ -283,8 +286,8 @@
 
   const handleFilter = async () => {
     viewType.value === 'Table'
-    ? dumpResult.value = await calendarInit()
-    : events.value = await calendarInit()
+    ? dumpResult.value = await calendarInit(0)
+    : events.value = await calendarInit(0)
   }
 
   const customScrollBehavior = (x, y) => {
@@ -313,7 +316,7 @@
       }`;
       filterFrom.value = formattedStart;
       filterTo.value = formattedEnd;
-      dumpResult.value = await calendarInit();
+      dumpResult.value = await calendarInit(page.value);
     }
   });
   onUnmounted(() => {
