@@ -55,18 +55,19 @@
     <div class = "flex justify-center h-screen mb-20">
       <div class = "modal-relative w-full sm:w-full md:w-3/4 lg:w-2/4 xl:w-2/4 2xl:w-2/4 p-2 sm:p-2 md:p-4 lg:p-6 xl:p-6 2xl:p-6">
         <div class='bg-white dark:bg-slate-800/90 rounded-md mb-10'>
-          <div class='float-right text-2xl text-center'>
-            <button
-              class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
-              type = "button"
-              @click = "emits('close-callback')"
-            >
-              <i class = "fa fa-times"></i>
-            </button>
-            
+          <div class='flex justify-end align-end text-2xl text-center mr-2'>
+            <div class = "mt-1">
+              <button
+                class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                type = "button"
+                @click = "emits('close-callback')"
+              >
+                <i class = "fa fa-times"></i>
+              </button>
+            </div>
           </div>
-          <div class = "mb-2 border-b-2 dark:border-gray-600/50 py-6 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
-            <span class = "text-2xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl 2xl:text-2xl text-sky-500 uppercase p-8 ">Filter&nbsp;Table</span>
+          <div class = "flex justify-center sm:justify-center md:justify-start lg:justify-start xl:justify-start 2xl:justify-start mb-2 border-b-2 dark:border-gray-600/50 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
+            <span class = "text-4xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-5xl 2xl:text-5xl text-sky-500 uppercase pb-8 px-8">Filter&nbsp;Table</span>
           </div>
           <div class = "p-5">
             <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-2 w-full mb-2" v-if = "viewType === 'Table'">

@@ -46,6 +46,7 @@
   const page = ref(0);
   const debounceTimer = ref(1000);
   const invokeScrolling = ref();
+  const scheduleLegend = ref([]);
 
   const calendarPlugins = ref([
     dayGridPlugin,
@@ -153,19 +154,18 @@
       const to = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
       const formattedStart = `${
         from.getFullYear()}-${String(from.getMonth()).padStart(2, '0')}-${String(from.getDate()).padStart(2, '0')
-        }`;
-        const formattedEnd = `${
-          to.getFullYear()}-${String(to.getMonth() + 1).padStart(2, '0')}-${String(to.getDate()).padStart(2, '0')
-          }`;
-          filterFrom.value = formattedStart;
-          filterTo.value = formattedEnd;
-          displayTableFilter.value = true;
-          identifyView.value = displayTableFilter.value;
+      }`;
+      const formattedEnd = `${
+        to.getFullYear()}-${String(to.getMonth() + 1).padStart(2, '0')}-${String(to.getDate()).padStart(2, '0')
+      }`;
+      filterFrom.value = formattedStart;
+      filterTo.value = formattedEnd;
+      displayTableFilter.value = true;
+      identifyView.value = displayTableFilter.value;
     } else if (viewType.value === "Calendar") {
       displayCalendarFilter.value = true;
       identifyView.value = displayCalendarFilter.value;
     }
-    console.log(identifyView.value)
   }
 
   const handleScheduleInfoForm = async (id) => {
@@ -224,9 +224,10 @@
       filterType.value = type;
       filterFrequency.value = frequency;
       filterStatus.value = serviceResult;
-      const { result, isAll } = data;
+      const { schedule, result, isAll } = data;
       paginationStatus.value = isAll === true ? "All schedules are displayed" : "Loading more record.. Please wait..";
       isAllDisplayed.value = isAll === true ? true : false;
+      scheduleLegend.value = schedule;
       return result;
     } catch (error) {
       console.error('Error fetching data:', error.message);
@@ -299,7 +300,7 @@
   }
 
   onMounted(async () => {
-    customScrollBehavior(50, 100);
+    customScrollBehavior(230, 100);
     window.addEventListener('scroll', handleScroll);
     await getPredefinedData();
     if (localStorage.getItem("view-type-local") === "Table") {
@@ -371,7 +372,20 @@
             <div class = "rounded shadow-2xl shadow-gray-800 p-4 bg-white dark:bg-slate-800/70 dark:text-white">
               <div class = "flex grid grid-cols-1 mb-4">
                 <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-                  <span class = "">View Type</span>
+                  <span class = "font-bold">Asset Frequency Schedule: </span>
+                </div>
+                <ul class = "ml-4 list-disc list-inside dark:text-slate-400 text-sm">
+                  <li v-if = "scheduleLegend.length > 0" v-for="schedule in scheduleLegend">
+                    {{ schedule.description }}: 
+                    <span v-if = "schedule.scheduled">
+                      <i class = "text-green-400 fa-solid fa-circle-check"></i>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <div class = "flex grid grid-cols-1 mb-4">
+                <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                  <span class = "font-bold">View Type: </span>
                 </div>
                 <select v-model = "viewType" @change = "handleViewType" class = 'text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full sm:w-full md:w-64 lg:w-64 xl:w-64 2xl:w-64 p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white'>
                   <option>Calendar</option>

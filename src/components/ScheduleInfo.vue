@@ -1,10 +1,11 @@
 <script setup>
   import axios, { AxiosError } from 'axios';
   import { useToast } from "vue-toastification";
-  import { AMS_MODEL_PATH } from '../assets/global.js'
+  import { AMS_MODEL_PATH, authToken } from '../assets/global.js'
   import { ref, onMounted, onUnmounted } from 'vue';
   import ServiceTable from "./ServiceTable.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
+  import InputTextArea from "./InputTextArea.vue";
 
   const toast = useToast();
 
@@ -34,10 +35,60 @@
   const equipment = ref("");
   const assetStatus = ref("");
   const assetStatusColor = ref("");
+  const displayWoRemarks = ref(false);
+  const reasonForCancellation = ref("");
+  const woId = ref("");
+  const woResult = ref("");
   const handleUnmountComponent = (e) => {
     if (e.key === "Escape") {
       props.closeCallBack();
       document.body.style.overflowY = "auto"
+    }
+  }
+
+  const handleCancel = () => {
+    displayWoRemarks.value = !displayWoRemarks.value
+  }
+
+  const handleCancelSubmit = async () => {
+    if (!reasonForCancellation.value) {
+      toast.warning(`Please fill out the REASON OF CANCELLATION field`, {
+        icon: "fa-solid fa-triangle-exclamation",
+      });
+      return false;
+    }
+    const reason = reasonForCancellation.value;
+    const auth = await authToken();
+    const id = props.id;
+    const payloadBody = {
+      id:id,
+      reason:reason
+    };
+
+    const { data } = await axios.post(
+      AMS_MODEL_PATH,
+      payloadBody,
+      {
+        headers: {
+          "Content-Type":"application/json",
+          "Event-Key":"cancel-work-order",
+          "Authorization": auth
+        }
+      }
+    );
+    const { success, message } = data
+    if (success) {
+      toast.success(message, {
+        icon: "fa-solid fa-circle-check",
+      });
+      reasonForCancellation.value = "";
+      await getWorkOrder();
+      await props.closeCallBack();
+    } else {
+      toast.warning(message, {
+        icon: "fa-solid fa-triangle-exclamation",
+      });
+      return false;
     }
   }
 
@@ -77,7 +128,9 @@
         details,
         equipmentUsed,
         statusDescription,
-        statusDescriptionColor
+        statusDescriptionColor,
+        workOrderResult,
+        workOrderResultId
       } = result.workOrder;
 
       eventTitle.value = title;
@@ -95,6 +148,9 @@
       aId.value = assetId;
       assetStatus.value = statusDescription;
       assetStatusColor.value = statusDescriptionColor;
+      woId.value = workOrderResultId;
+      woResult.value = workOrderResult;
+      console.log(workOrderResultId);
     } catch (error) {
       if (error instanceof AxiosError) {
         const { message, status } = error.response;
@@ -134,19 +190,56 @@
     <div class = "flex justify-center h-screen mb-20">
       <div class = "modal-relative w-full sm:w-full md:w-4/5 lg:w-4/5 xl:w-4/5 2xl:w-4/5 p-2 sm:p-2 md:p-4 lg:p-6 xl:p-6 2xl:p-6">
         <div class='bg-white dark:bg-slate-800/90 rounded-md mb-10'>
-          <div class='float-right text-2xl text-center'>
-            <button
-              class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
-              type = "button"
-              @click = "closeCallBack"
-            >
-              <i class = "fa fa-times"></i>
-            </button>
-            
+          <div class='flex justify-end align-end text-2xl text-center mr-2'>
+            <div class = "mt-1">
+              <button
+                class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-red-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                type = "button"
+                @click = "handleCancel"
+                title = "Cancel Work Order"
+                v-if = "woId === 1"
+              >
+                <i class = "fa-solid fa-trash"></i>
+              </button>
+              <button
+                class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                type = "button"
+                @click = "closeCallBack"
+                title = "Close form"
+              >
+                <i class = "fa fa-times"></i>
+              </button>
+            </div>
           </div>
-          <div class = "mb-2 border-b-2 dark:border-gray-600/50 py-6 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
-            <span class = "text-2xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl 2xl:text-2xl text-sky-500 uppercase p-8 ">Work&nbsp;Order</span>
+          <div class = "flex justify-center sm:justify-center md:justify-start lg:justify-start xl:justify-start 2xl:justify-start mb-2 border-b-2 dark:border-gray-600/50 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
+            <span class = "text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-5xl 2xl:text-5xl text-sky-500 uppercase pb-8 px-8">Work&nbsp;Order</span>
           </div>
+          <div class='flex grid grid-cols-1 gap-4 px-4 mt-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }' v-if = "displayWoRemarks">
+            <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+              <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+                <span class = "">Reason of Cancellation</span>&nbsp;<span class="text-red-500">*</span>
+              </div>
+              <InputTextArea
+                textAreaClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white h-32"
+                v-model = "reasonForCancellation"
+              />
+              <div class = "flex justify-end items-end mb-4">
+                <span class = "uppercase dark:text-slate-400 text-xs justify-end font-medium">{{ reasonForCancellation.length }} / 500</span>
+              </div>
+              <div class = "flex justify-end items-end mb-2">
+                <button
+                  class='font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full sm:w-32 md:w-32 lg:w-32 xl:w-32 2xl:w-32 border border-green-500 rounded dark:bg-slate-800 text-green-500 hover:bg-green-500 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50'
+                  type = "button"
+                  @click = "handleCancelSubmit"
+                  title = "Submit Remarks"
+                >
+                  <i class = "fa-regular fa-paper-plane"></i>&nbsp; Submit
+                </button>
+              </div>
+              
+            </div>
+          </div>
+          
           <div class = "flex grid grid-cols-1 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">

@@ -46,8 +46,6 @@
   const serviceDescriptionText = ref("");
   const handler = ref(0);
   const handlerOptions = ref([]);
-  const serviceResult = ref(0);
-  const serviceResultOptions = ref([]);
   const assetStatus = ref(0);
   const assetStatusOptions = ref([]);
   const performedBy = ref("");
@@ -75,7 +73,6 @@
   }
   
   const handleSaveSchedule = async () => {
-    
     if (!woTitle.value || woTitle.value.length === 0) {
       toast.warning("Title field is required.", {
         icon: "fa-solid fa-triangle-exclamation",
@@ -131,14 +128,10 @@
           throw new Error ("Supervised By is required.");
         }
         formData.append("supervisedBy", JSON.stringify(supervisedBy.value));
-        formData.append("serviceStatus", serviceResult.value);
-        if (!serviceResult.value) {
-          throw new Error ("Service status is required.");
-        }
-        formData.append("assetStatus", assetStatus.value);
         if (!assetStatus.value) {
           throw new Error ("Asset status is required.");
         }
+        formData.append("assetStatus", assetStatus.value);
         if (!serviceDescriptionText.value) {
           throw new Error ("Service Description textbox is required");
         }
@@ -251,8 +244,6 @@
     recurrence.value = parseInt(maintenance.value) === 3 ? props.start : "";
     handlerOptions.value = props.predefined.personnel;
     handler.value = props.predefined.personnel[0].id;
-    serviceResultOptions.value = props.predefined.serviceResult;
-    serviceResult.value = props.predefined.serviceResult[0].id;
     assetStatusOptions.value = props.predefined.assetStatus;
     assetStatus.value = props.predefined.assetStatus[0].id;
     // handleFrequencyRule(props.start);
@@ -268,19 +259,21 @@
     <div class = "flex justify-center h-screen mb-20">
       <div class = "modal-relative w-full sm:w-full md:w-4/5 lg:w-4/5 xl:w-4/5 2xl:w-4/5 p-2 sm:p-2 md:p-4 lg:p-6 xl:p-6 2xl:p-6">
         <div class='bg-white dark:bg-slate-800/90 rounded-md mb-10'>
-          <div class='float-right text-2xl text-center'>
-            <button
-              class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-center text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
-              type = "button"
-              @click = "emits('close-callback')"
-            >
-              <i class = "fa fa-times"></i>
-            </button>
-            
+          <div class='flex justify-end align-end text-2xl text-center mr-2'>
+            <div class = "mt-1">
+              <button
+                class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-center text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                type = "button"
+                @click = "emits('close-callback')"
+              >
+                <i class = "fa fa-times"></i>
+              </button>
+            </div>
           </div>
-          <div class = "border-b-2 dark:border-gray-600/50 py-6 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
-            <span class = "text-2xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl 2xl:text-2xl text-sky-500 uppercase p-8">Add&nbsp;Work&nbsp;Order</span>
+          <div class = "flex justify-center sm:justify-center md:justify-start lg:justify-start xl:justify-start 2xl:justify-start mb-2 border-b-2 dark:border-gray-600/50 font-bold md:text-left lg:text-left xl:text-left 2xl:text-left">
+            <span class = "text-4xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-5xl 2xl:text-5xl text-sky-500 uppercase pb-8 px-8">Add&nbsp;Work&nbsp;Order</span>
           </div>
+          
           <div class = "px-8 mt-8 font-bold text-sky-500 md:text-left lg:text-left xl:text-left 2xl:text-left text-2xl uppercase">
             <span class=''>Schedule</span>
           </div>
@@ -405,11 +398,9 @@
               v-model:testingStartDate = "testingStartDate"
               v-model:testingEndDate = "testingEndDate"
               v-model:equipmentUsed = "equipmentUsed"
-              v-model:serviceResult = "serviceResult"
               v-model:assetStatus = "assetStatus"
               v-model:serviceDescriptionText = "serviceDescriptionText"
               @attach-file = "handleFileAttachment"
-              :serviceResultOptions = "serviceResultOptions"
               :handlerOptions = "handlerOptions"
               :assetStatusOptions = "assetStatusOptions"
               :serviceDocs = "serviceDocs"

@@ -39,7 +39,6 @@
   const testingStartDate = defineModel('testingStartDate');
   const testingEndDate = defineModel('testingEndDate');
   const equipmentUsed = defineModel('equipmentUsed');
-  const serviceResult = defineModel('serviceResult');
   const assetStatus = defineModel('assetStatus');
   const serviceDescriptionText = defineModel('serviceDescriptionText');
   const serviceDocInput = ref(null);
@@ -286,16 +285,6 @@
 
     <div class = "flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8 mb-2">
       
-      <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-        <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-          <span class = "">Service Status</span>&nbsp;<span class="text-red-500">*</span>
-        </div>
-        <Select
-          v-model = "serviceResult"
-          selectClass="text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white"
-          :options = "serviceResultOptions"
-        />
-      </div>
       <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
           <span class = "">Asset Status</span>&nbsp;<span class="text-red-500">*</span>
