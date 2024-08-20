@@ -406,10 +406,6 @@
               :serviceDocs = "serviceDocs"
             />
           </div>
-          
-          <!-- <div class = "text-center">
-            <span class = "font-normal text-xs dark:text-yellow-400 text-slate-800">NOTE: </span>
-          </div> -->
 
           <div className = "flex justify-end m-4 p-6">
             <Button

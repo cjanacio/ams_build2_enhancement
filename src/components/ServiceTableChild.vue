@@ -3,6 +3,7 @@
   import Button from "./Button.vue";
   import AddServiceLog from "./AddServiceLog.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
+  import UpdateServiceLog from "./UpdateServiceLog.vue";
   import axios, { AxiosError } from 'axios';
   import { authToken, AMS_MODEL_PATH } from '../assets/global.js'
   import { useToast } from "vue-toastification";
@@ -33,8 +34,6 @@
   const applyToEveryService = ref(false);
   const toArray = ref([props.serviceDetails]);
   
-  const serviceResult = ref(0);
-  const serviceResultOptions = ref([]);
   const assetStatus = ref(0);
   const assetStatusOptions = ref([]);
   const performedBy = ref("");
@@ -49,10 +48,15 @@
   const serviceDocs = ref([]);
   const testingStartDate = ref("");
   const testingEndDate = ref("");
+  const isGoingToEditService = ref(false);
 
   const handleFileAttachment = (filesAttached) => {
     serviceDocs.value = [];
     serviceDocs.value.push(...filesAttached);
+  }
+
+  const handleEditEvent = () => {
+    isGoingToEditService.value = !isGoingToEditService.value;
   }
 
   const handleSaveService = async () => {
@@ -160,8 +164,6 @@
         const { result } = data;
         handlerOptions.value = result.personnel;
         handler.value = result.personnel[0].id;
-        serviceResultOptions.value = result.serviceResult;
-        serviceResult.value = result.serviceResult[0].id;
         assetStatusOptions.value = result.assetStatus;
         assetStatus.value = result.assetStatus[0].id;
       } catch (error) {
@@ -184,7 +186,6 @@
   <tr :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "p-2 w-full bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700">
     <td colspan="3">
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit" v-if = "serviceDetails.serviceResult === 'Open'">
-        
         <AddServiceLog
           v-model:handler = "handler"
           v-model:purchaseOrder = "purchaseOrder"
@@ -199,7 +200,6 @@
           v-model:serviceDescriptionText = "serviceDescriptionText"
           v-model:applyToEveryService = "applyToEveryService"
           @attach-file = "handleFileAttachment"
-          :serviceResultOptions = "serviceResultOptions"
           :handlerOptions = "handlerOptions"
           :assetStatusOptions = "assetStatusOptions"
           :serviceDocs = "serviceDocs"
@@ -218,11 +218,31 @@
         </div>
       </div>
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit p-4" v-else-if = "serviceDetails.serviceResult === 'Closed'">
-        <div class = "dark:text-slate-400 text-center font-bold text-sm uppercase my-2 mb-4">
+        <div class = "dark:text-slate-400 text-center font-bold text-2xl uppercase my-2 mb-4">
           <span class = "">Service Log</span>
+          
         </div>
+        <div class = "float-right">
+          <Button
+            buttonText = ""
+            buttonClass = "float-right text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl"
+            buttonType = "button"
+            :onClickEvent = "handleEditEvent"
+            :iconSetting = "isGoingToEditService === true ? 'fa-solid fa-times' : 'fa-solid fa-pen-to-square'"
+            :isDisabled = "false"
+            :buttonTitle = "isGoingToEditService === true ? 'Cancel Editing of Service Log' : 'Edit Service Log'"
+          />
+        </div>
+        <UpdateServiceLog
+          :handlerOptions = "handlerOptions"
+          :assetStatusOptions = "assetStatusOptions"
+          :serviceData = "toArray"
+          v-if = "isGoingToEditService"
+        />
+        
         <ServiceLogInfo
           :serviceData = "toArray"
+          v-else-if = "!isGoingToEditService"
         />
         
       </div>
