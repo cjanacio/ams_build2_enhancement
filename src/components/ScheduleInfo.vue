@@ -150,7 +150,6 @@
       assetStatusColor.value = statusDescriptionColor;
       woId.value = workOrderResultId;
       woResult.value = workOrderResult;
-      console.log(workOrderResultId);
     } catch (error) {
       if (error instanceof AxiosError) {
         const { message, status } = error.response;
@@ -240,7 +239,7 @@
             </div>
           </div>
           
-          <div class = "flex grid grid-cols-1 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+          <div class = "flex grid grid-cols-1 gap-1 px-2 sm:px-2 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
                 <span class = "">Work Order Overall Asset Status</span>
@@ -252,7 +251,7 @@
               </div>
             </div>
           </div>
-          <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+          <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-1 px-2 sm:px-2 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                 <span class = "">Service Type:</span>&nbsp;<span class="dark:text-slate-200 font-bold"><br/>{{ maintenance }}</span>
@@ -264,7 +263,7 @@
               </div>
             </div>
           </div>
-          <div class = "flex grid grid-cols-1 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+          <div class = "flex grid grid-cols-1 gap-1 px-2 sm:px-2 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                 <span class = "">Title:</span>&nbsp;<span class="dark:text-slate-200 font-bold"><br/>{{ eventTitle }}</span>
@@ -272,7 +271,7 @@
               
             </div>
           </div>
-          <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+          <div class = "p-1 flex grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-1 px-2 sm:px-2 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                 <span class = "">Start:</span>&nbsp;<span class="dark:text-slate-200 font-bold"><br/>{{ start }}</span>
@@ -298,7 +297,7 @@
             </div>
           </div>
           
-          <div class = "text-sm dark:text-white flex grid grid-cols-1 gap-1 px-4 sm:px-4 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
+          <div class = "text-sm dark:text-white flex grid grid-cols-1 gap-1 px-2 sm:px-2 md:px-8 lg:px-8 xl:px-8 2xl:px-8">
             <div class='rounded border border-slate-300 dark:border-slate-600 p-2 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div v-if = "maintenanceId === 3">
                 <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
@@ -316,7 +315,7 @@
                   <span class = "">Service Log</span>
                 </div>
                 <ServiceLogInfo
-                  :assetId = "aId"
+                  @workOrderRecall = "getWorkOrder"
                   :serviceData = "serviceDescription"
                 />
                 

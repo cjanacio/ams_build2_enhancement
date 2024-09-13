@@ -62,6 +62,18 @@
     showAutoCorrect.value = false;
   }
 
+  const inputAmountFormat = (value) => {
+    incurredCost.value = value
+      .replace(/\D/g, "")
+      .replace(/([0-9])([0-9]{2})$/, '$1.$2')  
+      .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ",")
+    ;
+  }
+  
+  const handleUppercase = (value) => {
+    purchaseOrder.value = value.toUpperCase();
+  }
+
   const getActiveDirectoryList = async (user) => {
     showAutoCorrect.value = true;
     try {
@@ -226,6 +238,7 @@
           inputPlaceholder = "Purchase Order Number"
           inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           :isDisabled = "false"
+          @input = "handleUppercase($event.target.value)"
         />
       </div>
       <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
@@ -238,6 +251,7 @@
           inputPlaceholder = "Service Cost"
           inputClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           :isDisabled = "false"
+          @input = "inputAmountFormat($event.target.value)"
         />
       </div>
     </div>
@@ -303,6 +317,9 @@
         textAreaClass = "text-sm rounded shadow-lg shadow-slate-500 dark:shadow-none dark:bg-slate-900/70 dark:text-white dark:border-sky-500 w-full p-2 border border-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:text-white h-32"
         v-model = "serviceDescriptionText"
         />
+        <div class = "flex justify-end items-end mb-4">
+          <span class = "uppercase dark:text-slate-400 text-xs justify-end font-medium">{{ serviceDescriptionText.length }} / 1000</span>
+        </div>
       </div>
       <div class='justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">

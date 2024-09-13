@@ -1,15 +1,16 @@
 <script setup>
   import FileListing from "./FileListing.vue";
+  import ChangeLog from "./ChangeLog.vue";
   const props = defineProps({
     serviceData: {
       type: Array,
       required: true
-    },
-    workOrderRecall: {
-      type: Function,
-      required: false
     }
   });
+
+  const emits = defineEmits([
+    "workOrderRecall"
+  ])
 
 </script>
 
@@ -29,7 +30,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Performed by</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].performedBy }}
@@ -40,7 +41,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Supervised by</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].supervisedBy.name }}
@@ -52,7 +53,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Service Purchase Order</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].purchaseOrder }}
@@ -62,10 +63,15 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Incurred Cost</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
-            {{ props.serviceData[0].incurredCost }}
+            {{ 
+              props.serviceData[0].incurredCost
+              .replace(/\D/g, "")
+              .replace(/([0-9])([0-9]{2})$/, '$1.$2')  
+              .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ",")
+            }}
           </span>
         </div>
       </div>
@@ -75,7 +81,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Actual Start Date</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].testStartDate }}
@@ -85,7 +91,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Actual End Date</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].testEndDate }}
@@ -99,7 +105,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Equipment used</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].equipment }}
@@ -109,7 +115,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Service Status</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].serviceResult }}
@@ -119,7 +125,7 @@
       <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
         <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase">
           <span class = "">Asset Status</span>
-          </div>
+        </div>
         <div class = "text-left">
           <span class="dark:text-slate-200 font-bold text-left">
             {{ props.serviceData[0].detailsStatus }}
@@ -141,12 +147,20 @@
       </div>
     </div>
     <div class = "mt-1 flex grid grid-cols-1">
-        <div class='px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
-          <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
-            <span class = "">Service Documents</span>
-          </div>
-          <FileListing :serviceDocs = "props.serviceData[0].files"/>
+      <div class='h-auto px-4 w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+        <div class = "mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+          <span class = "">Service Documents</span>
         </div>
+        <FileListing :serviceDocs = "props.serviceData[0].files"/>
       </div>
+    </div>
+    <div class = "mt-1 flex grid grid-cols-1">
+      <div class='overflow-x-auto h-auto w-full rounded border border-slate-300 dark:border-slate-600 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+        <div class = "px-4 mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+          <span class = "">Change Log</span>
+        </div>
+        <ChangeLog :id = "props.serviceData[0].id" />
+      </div>
+    </div>
   </div>
 </template>

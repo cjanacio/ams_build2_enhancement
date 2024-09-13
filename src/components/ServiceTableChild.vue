@@ -42,6 +42,7 @@
     mail: "",
     account: ""
   });
+  const childDiv = ref(null);
   const purchaseOrder = ref("");
   const incurredCost = ref("");
   const equipmentUsed = ref("");
@@ -77,10 +78,7 @@
         throw new Error ("Supervised By is required.");
       }
       formData.append("supervisedBy", JSON.stringify(supervisedBy.value));
-      if (!serviceResult.value) {
-        throw new Error ("Service status is required.");
-      }
-      formData.append("serviceStatus", serviceResult.value);
+      
       if (!assetStatus.value) {
         throw new Error ("Asset status is required.");
       }
@@ -145,6 +143,7 @@
   }
 
   onMounted(async () => {
+    childDiv.value.scrollIntoView({ behavior: 'smooth' });
     const getPredefinedData = async () => {
       try {
         const token = await authToken();
@@ -183,7 +182,7 @@
 
 </script>
 <template>
-  <tr :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "p-2 w-full bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700">
+  <tr :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "p-2 w-full bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700" ref = "childDiv">
     <td colspan="3">
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit" v-if = "serviceDetails.serviceResult === 'Open'">
         <AddServiceLog
@@ -217,10 +216,9 @@
           />
         </div>
       </div>
-      <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit p-4" v-else-if = "serviceDetails.serviceResult === 'Closed'">
+      <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 md:mx-7 lg:mx-7 xl:mx-7 2xl:mx-7  bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit p-4" v-else-if = "serviceDetails.serviceResult === 'Closed'">
         <div class = "dark:text-slate-400 text-center font-bold text-2xl uppercase my-2 mb-4">
           <span class = "">Service Log</span>
-          
         </div>
         <div class = "float-right">
           <Button
@@ -238,6 +236,7 @@
           :assetStatusOptions = "assetStatusOptions"
           :serviceData = "toArray"
           v-if = "isGoingToEditService"
+          @reset-form = "handleEditEvent"
         />
         
         <ServiceLogInfo

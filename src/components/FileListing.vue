@@ -11,7 +11,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <ul class = "p-4 list-none mt-2 text-left" v-if = "serviceDocs.length > 0">
+  <ul class = "md:p-2 lg:p-4 xl:p-4 2xl:p-4 list-none mt-2 text-left" v-if = "serviceDocs.length > 0">
     <FileListItem
       v-for = "serviceDoc in serviceDocs"
       v-if = "serviceDocs.length > 0"
