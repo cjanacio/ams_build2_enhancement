@@ -59,6 +59,7 @@ onMounted(() => {
         :changeLog = "changeLog"
         v-if = "changeLogs.length > 0"
         v-for = "changeLog in changeLogs"
+        @get-change-log = "getChangeLog"
       />
       <tr class = "p-2 bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700" v-else>
         <td colspan="5" class = "px-4 py-4 uppercase font-bold text-center">No Change Log record found</td>

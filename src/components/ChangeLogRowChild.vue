@@ -15,12 +15,18 @@ const props = defineProps({
   id: {
     type: Number,
     required: true
+  },
+  status: {
+    type: String,
+    required: true
   }
 });
-
+const emits = defineEmits([
+  'get-change-log'
+]);
 const id = ref(props.id);
 
-const handlDeclineEditRequest = async () => {
+const handleEditRequest = async (action) => {
   try {
     const auth = await authToken();
     const payLoad = {
@@ -32,7 +38,7 @@ const handlDeclineEditRequest = async () => {
       {
         headers: {
           "Content-Type":"multipart/form-data",
-          "Event-Key":"put-decline-edit-req",
+          "Event-Key": action === "Reject" ? "put-decline-edit-req" : "approve-service-log-details",
           "Authorization": auth
         }
       }
@@ -44,17 +50,15 @@ const handlDeclineEditRequest = async () => {
       });
       return false;
     }
+    emits('get-change-log');
     toast.success(message, {
-      icon: "fa-solid fa-triangle-exclamation",
+      icon: "fa-solid fa-circle-check",
     });
   } catch (error) {
     console.log(error)
   }
 }
 
-const handleApproveEditRequest = async () => {
-  alert("Approve");
-}
 </script>
 <template>
   <tr :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "p-2 w-full bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700" ref = "childDiv">
@@ -80,12 +84,12 @@ const handleApproveEditRequest = async () => {
             </tr>
           </tbody>
         </table>
-        <div className = "flex justify-end p-6">
+        <div className = "flex justify-end p-6" v-if = "status === 'FOR REVIEW'">
           <Button
             buttonText = "Approve"
             buttonClass = "m-1 font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 border border-green-500 rounded dark:bg-slate-800 text-green-500 hover:bg-green-500 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50"
             buttonType = "button"
-            :onClickEvent = "handleApproveEditRequest"
+            :onClickEvent = "() => handleEditRequest(`Approve`)"
             iconSetting = "fa-solid fa-paper-plane"
             :isDisabled = "false"
             buttonTitle = "Approve"
@@ -94,7 +98,7 @@ const handleApproveEditRequest = async () => {
             buttonText = "Decline"
             buttonClass = "m-1 font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full sm:w-44 md:w-44 lg:w-44 xl:w-44 2xl:w-44 border border-red-500 rounded dark:bg-slate-800 text-red-500 hover:bg-red-500 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50"
             buttonType = "button"
-            :onClickEvent = "handlDeclineEditRequest"
+            :onClickEvent = "() => handleEditRequest(`Reject`)"
             iconSetting = "fa-solid fa-paper-plane"
             :isDisabled = "false"
             buttonTitle = "Approve"

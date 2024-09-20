@@ -8,6 +8,10 @@ const props = defineProps({
     required: true
   }
 });
+console.log(props.changeLog);
+const emits = defineEmits([
+  'get-change-log'
+]);
 
 const appendChangeLogChild = ref(false);
 const handleAppendChild = () => {
@@ -40,5 +44,11 @@ const handleAppendChild = () => {
       {{ props.changeLog.requestStatus }}
     </td>
   </tr>
-  <ChangeLogRowChild v-if = "appendChangeLogChild" :details = "props.changeLog.details" :id = "props.changeLog.changeLogId"/>
+  <ChangeLogRowChild
+  @get-change-log = "emits('get-change-log')"
+  v-if = "appendChangeLogChild"
+  :details = "props.changeLog.details"
+  :status = "props.changeLog.requestStatus"
+  :id = "props.changeLog.changeLogId"
+  />
 </template>

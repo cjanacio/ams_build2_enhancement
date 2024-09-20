@@ -14,6 +14,7 @@
   import Button from './components/Button.vue';
   import TableScheduleView from './components/TableScheduleView.vue';
   import FilterDisplay from './components/FilterDisplay.vue';
+  import AssetInfo from './components/AssetInfo.vue';
   __ENV__ === "DEV" && window.location.assign(`${ PARAM_URL }#1&1&1`);  /* DEV PURPOSES */
 
   /* START STATE MANAGEMENT */
@@ -47,6 +48,7 @@
   const debounceTimer = ref(1000);
   const invokeScrolling = ref();
   const scheduleLegend = ref([]);
+  const displayAssetInfo = ref(false);
 
   const calendarPlugins = ref([
     dayGridPlugin,
@@ -291,6 +293,10 @@
     : events.value = await calendarInit(0)
   }
 
+  const handleAssetInfo = () => {
+    displayAssetInfo.value = !displayAssetInfo.value;
+  }
+
   const customScrollBehavior = (x, y) => {
     window.scroll({
       top: x,
@@ -328,6 +334,11 @@
 </script>
 
 <template>
+  <AssetInfo
+    v-if = "displayAssetInfo"
+    @close-callback = "handleAssetInfo"
+    :id = "parseInt(assetId)"
+  />
   <ScheduleInfo
     v-if = "displaySchedule"
     :closeCallBack = "handleScheduleInfoForm"
@@ -341,10 +352,7 @@
     :id = "parseInt(assetId)"
     :predefined = "predefined"
   />
-  <!-- <FilterCalendar
-    @close-callback = "handleCloseCalendarFilter"
-    v-model:
-  /> -->
+
   <FilterDisplay
     v-if = "identifyView"
     @close-callback = "handleCloseFilter"
@@ -370,6 +378,16 @@
         <div class = "mb-20" :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }">
           <div class = "lg:p-4 xl:p-4 2xl:p-4 bg-fixed bg-no-repeat dark:bg-no-bg flex grid grid-cols-1 justify-center w-full">
             <div class = "rounded shadow-2xl shadow-gray-800 p-4 bg-white dark:bg-slate-800/70 dark:text-white">
+              <div class = "flex justify-end items-end">
+                <button
+                  class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-400 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                  type = "button"
+                  @click = "handleAssetInfo"
+                  title = "View Asset General Info"
+                >
+                  <i class="ml-0.5 fa-solid fa-file-circle-question"></i>
+                </button>
+              </div>
               <div class = "flex grid grid-cols-1 mb-4">
                 <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                   <span class = "font-bold">Asset Frequency Schedule: </span>
