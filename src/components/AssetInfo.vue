@@ -16,6 +16,7 @@ const props = defineProps({
 
 const assetInfo = ref([]);
 const changeLogs = ref([]);
+const files = ref([]);
 const handleCloseForm = (e) => {
   if (e.key === "Escape") {
     emits('close-callback');
@@ -42,7 +43,8 @@ const getAssetInfo = async () => {
     const { success, asset } = data;
     if (success) {
       assetInfo.value = asset[0];
-      changeLogs.value = assetInfo.changeLog.result.value;
+      changeLogs.value = assetInfo.value.changeLog.result;
+      files.value = asset[0].files;
     }
     
   } catch (error) {
@@ -225,7 +227,7 @@ onUnmounted(() => {
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
               <div class = "dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
                 <span class = "">Attachments</span>
-                <FileListing :serviceDocs = "assetInfo.files"/>
+                <FileListing :serviceDocs = "files"/>
               </div>
             </div>
             <div class='rounded border border-slate-300 dark:border-slate-600 p-4 justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
