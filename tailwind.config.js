@@ -16,9 +16,7 @@ export default {
         'rob-land-corp-white': "url('https://webappservice-stg.robinsonsland.com/src/img/logo-rlc-white.png')",
         'loading-gif': "url('https://webappservice-stg.robinsonsland.com/src/img/tenor.gif')"
       },
-      
     },
-    
   },
   plugins: [],
 }

@@ -1,9 +1,8 @@
 <script setup>
-  import { ref, onMounted } from "vue";
+  import { ref, onMounted, onBeforeMount } from "vue";
   import Button from "./Button.vue";
   import AddServiceLog from "./AddServiceLog.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
-  import UpdateServiceLog from "./UpdateServiceLog.vue";
   import axios, { AxiosError } from 'axios';
   import { authToken, AMS_MODEL_PATH } from '../assets/global.js'
   import { useToast } from "vue-toastification";
@@ -28,12 +27,13 @@
     }
   });
   const emit = defineEmits(['recall-work-order', "hide-child-state"]);
+  const maintenance = defineModel("maintenance");
   const serviceDescriptionText = ref("");
   const handler = ref(0);
   const handlerOptions = ref([]);
   const applyToEveryService = ref(false);
   const toArray = ref([props.serviceDetails]);
-  
+  const displayUpdateForm = ref(false);
   const assetStatus = ref(0);
   const assetStatusOptions = ref([]);
   const performedBy = ref("");
@@ -142,8 +142,11 @@
     
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     childDiv.value.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  onBeforeMount(async () => {
     const getPredefinedData = async () => {
       try {
         const token = await authToken();
@@ -165,6 +168,7 @@
         handler.value = result.personnel[0].id;
         assetStatusOptions.value = result.assetStatus;
         assetStatus.value = result.assetStatus[0].id;
+        displayUpdateForm.value = true;
       } catch (error) {
         if (error instanceof AxiosError) {
           const { status } = error.response;
@@ -177,8 +181,7 @@
       }
     }
     await getPredefinedData();
-
-  });
+  })
 
 </script>
 <template>
@@ -186,6 +189,7 @@
     <td colspan="3">
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit" v-if = "serviceDetails.serviceResult === 'Open'">
         <AddServiceLog
+          v-model:maintenanceType = "maintenance"
           v-model:handler = "handler"
           v-model:purchaseOrder = "purchaseOrder"
           v-model:incurredCost = "incurredCost"
@@ -194,7 +198,6 @@
           v-model:testingStartDate = "testingStartDate"
           v-model:testingEndDate = "testingEndDate"
           v-model:equipmentUsed = "equipmentUsed"
-          v-model:serviceResult = "serviceResult"
           v-model:assetStatus = "assetStatus"
           v-model:serviceDescriptionText = "serviceDescriptionText"
           v-model:applyToEveryService = "applyToEveryService"
@@ -220,28 +223,14 @@
         <div class = "dark:text-slate-400 text-center font-bold text-2xl uppercase my-2 mb-4">
           <span class = "">Service Log</span>
         </div>
-        <div class = "float-right">
-          <Button
-            buttonText = ""
-            buttonClass = "float-right text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl"
-            buttonType = "button"
-            :onClickEvent = "handleEditEvent"
-            :iconSetting = "isGoingToEditService === true ? 'fa-solid fa-times' : 'fa-solid fa-pen-to-square'"
-            :isDisabled = "false"
-            :buttonTitle = "isGoingToEditService === true ? 'Cancel Editing of Service Log' : 'Edit Service Log'"
-          />
-        </div>
-        <UpdateServiceLog
-          :handlerOptions = "handlerOptions"
-          :assetStatusOptions = "assetStatusOptions"
-          :serviceData = "toArray"
-          v-if = "isGoingToEditService"
-          @reset-form = "handleEditEvent"
-        />
         
         <ServiceLogInfo
+          @workOrderRecall = "getWorkOrder"
+          v-if = "displayUpdateForm"
           :serviceData = "toArray"
-          v-else-if = "!isGoingToEditService"
+          :handlerOptions = "handlerOptions"
+          :assetStatusOptions = "assetStatusOptions"
+          :id = "toArray[0].id"
         />
         
       </div>

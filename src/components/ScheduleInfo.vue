@@ -2,7 +2,7 @@
   import axios, { AxiosError } from 'axios';
   import { useToast } from "vue-toastification";
   import { AMS_MODEL_PATH, authToken } from '../assets/global.js'
-  import { ref, onMounted, onUnmounted } from 'vue';
+  import { ref, onMounted, onUnmounted, onBeforeMount } from 'vue';
   import ServiceTable from "./ServiceTable.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
   import InputTextArea from "./InputTextArea.vue";
@@ -33,12 +33,17 @@
   const frequencySched = ref("");
   const serviceDescription = ref([]);
   const equipment = ref("");
-  const assetStatus = ref("");
+  const assetStatusDescription = ref("")
+  const assetStatus = ref(0);
   const assetStatusColor = ref("");
   const displayWoRemarks = ref(false);
   const reasonForCancellation = ref("");
   const woId = ref("");
   const woResult = ref("");
+  const handler = ref(0);
+  const handlerOptions = ref([]);
+  const assetStatusOptions = ref([]);
+  const displayUpdateForm = ref(false);
   const handleUnmountComponent = (e) => {
     if (e.key === "Escape") {
       props.closeCallBack();
@@ -71,7 +76,7 @@
       {
         headers: {
           "Content-Type":"application/json",
-          "Event-Key":"cancel-work-order",
+          "Event-Key":"cancel-request-service-log",
           "Authorization": auth
         }
       }
@@ -146,7 +151,7 @@
       maintenanceId.value = maintenanceTypeId;
       equipment.value = equipmentUsed;
       aId.value = assetId;
-      assetStatus.value = statusDescription;
+      assetStatusDescription.value = statusDescription;
       assetStatusColor.value = statusDescriptionColor;
       woId.value = workOrderResultId;
       woResult.value = workOrderResult;
@@ -174,11 +179,44 @@
   onMounted(async () => {
     window.addEventListener("keyup", handleUnmountComponent);
     document.body.style.overflowY = "hidden";
-    
+    const getPredefinedData = async () => {
+      try {
+        const token = await authToken();
+        const payloadHeader = {
+          "Content-Type":"application/json",
+          "Authorization": token,
+          "Event-Key": "get-predefined-data"
+        }
+        const { data } = await axios.get(AMS_MODEL_PATH, {
+          params: {
+            id:aId.value
+          },
+          headers: payloadHeader,
+          data: {}
+        });
+
+        const { result } = data;
+        handlerOptions.value = result.personnel;
+        handler.value = result.personnel[0].id;
+        assetStatusOptions.value = result.assetStatus;
+        assetStatus.value = result.assetStatus[0].id;
+        displayUpdateForm.value = true;
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const { status } = error.response;
+          if (status === 503) {
+            location.reload();
+          } else {
+            window.location.href = `index.php?page=${ status }`;
+          }
+        }
+      }
+    }
     await getWorkOrder();
+    await getPredefinedData();
   });
 
-  onUnmounted(() => {
+  onUnmounted(async () => {
     window.removeEventListener("keyup", handleUnmountComponent);
   });
 
@@ -192,7 +230,7 @@
           <div class='flex justify-end align-end text-2xl text-center mr-2'>
             <div class = "mt-1">
               <button
-                class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-red-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                class='mx-1 text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-red-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
                 type = "button"
                 @click = "handleCancel"
                 title = "Cancel Work Order"
@@ -201,7 +239,7 @@
                 <i class = "fa-solid fa-trash"></i>
               </button>
               <button
-                class='text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
+                class='mx-1 text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
                 type = "button"
                 @click = "closeCallBack"
                 title = "Close form"
@@ -225,7 +263,7 @@
               <div class = "flex justify-end items-end mb-4">
                 <span class = "uppercase dark:text-slate-400 text-xs justify-end font-medium">{{ reasonForCancellation.length }} / 500</span>
               </div>
-              <div class = "flex justify-end items-end mb-2">
+              <div class = "flex justify-end items-end mb-6">
                 <button
                   class='font-bold uppercase text-xs shadow-lg shadow-slate-500 dark:shadow-none w-full sm:w-32 md:w-32 lg:w-32 xl:w-32 2xl:w-32 border border-green-500 rounded dark:bg-slate-800 text-green-500 hover:bg-green-500 hover:text-white hover:cursor-pointer bg-white p-2 transition ease-in-out delay-50'
                   type = "button"
@@ -245,8 +283,8 @@
                 <span class = "">Work Order Overall Asset Status</span>
               </div>
               <div class = "text-left">
-                <span class="dark:text-slate-200 font-bold text-left uppercase " :style='{ color: assetStatusColor }'>
-                  {{ assetStatus }}
+                <span class="font-bold text-left uppercase " :style='{ color: assetStatusColor }'>
+                  {{ assetStatusDescription }}
                 </span>
               </div>
             </div>
@@ -304,6 +342,7 @@
                   <span class = "">Services:</span>
                 </div>
                 <ServiceTable
+                  :maintenanceId = "maintenanceId"
                   :serviceData = "serviceDescription"
                   :assetId = "aId"
                   :workOrderId = "props.id"
@@ -316,7 +355,12 @@
                 </div>
                 <ServiceLogInfo
                   @workOrderRecall = "getWorkOrder"
+                  v-if = "displayUpdateForm"
                   :serviceData = "serviceDescription"
+                  :handlerOptions = "handlerOptions"
+                  :assetStatusOptions = "assetStatusOptions"
+                  :id = "props.id"
+                  :maintenance = "maintenanceId"
                 />
                 
               </div>

@@ -1,9 +1,14 @@
 <script setup>
+import { ref } from 'vue';
 import ServiceTableRow from './ServiceTableRow.vue';
 const props = defineProps({
   serviceData: {
     type: Array,
-    require: true
+    required: true
+  },
+  maintenanceId: {
+    type: Number,
+    required: true
   },
   assetId: {
     type: Number,
@@ -19,6 +24,7 @@ const props = defineProps({
   }
 });
 
+const maintenanceId = ref(props.maintenanceId);
 </script>
 
 <template>
@@ -32,6 +38,7 @@ const props = defineProps({
     </thead>
     <tbody>
       <ServiceTableRow
+        v-model:maintenanceId = "maintenanceId"
         v-for = "service in serviceData"
         v-if = "serviceData.length > 0"
         :service = "service"

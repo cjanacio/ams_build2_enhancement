@@ -8,7 +8,6 @@ const props = defineProps({
     required: true
   }
 });
-console.log(props.changeLog);
 const emits = defineEmits([
   'get-change-log'
 ]);

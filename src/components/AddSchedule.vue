@@ -44,6 +44,8 @@
   const serviceDescriptionOptions = ref([]);
   const endOfRecurrence = ref("");
   const serviceDescriptionText = ref("");
+  const serviceResult = ref(0);
+  const serviceResultOptions = ref([]);
   const handler = ref(0);
   const handlerOptions = ref([]);
   const assetStatus = ref(0);
@@ -103,7 +105,6 @@
 
     try {
       
-      const auth = await authToken();
       const formData = new FormData();
       formData.append("assetId", assetId.value);
       formData.append("maintenanceType", maintenance.value);
@@ -121,12 +122,6 @@
           throw new Error ("Handled By is required.");
         }
         formData.append("performedBy", performedBy.value);
-        if (!performedBy.value) {
-          throw new Error ("Performed By is required.");
-        }
-        if (!supervisedBy.value) {
-          throw new Error ("Supervised By is required.");
-        }
         formData.append("supervisedBy", JSON.stringify(supervisedBy.value));
         if (!assetStatus.value) {
           throw new Error ("Asset status is required.");
@@ -140,10 +135,12 @@
         equipmentUsed.value && formData.append("equipmentUsed", equipmentUsed.value);
         testingStartDate.value && formData.append("testingStartDate", testingStartDate.value);
         testingEndDate.value && formData.append("testingEndDate", testingEndDate.value);
+        serviceResult.value && formData.append("serviceResult", serviceResult.value);
         serviceDocs.value.map((file, index) => {
           formData.append(`docs${ index }`, file);
         });
       }
+      const auth = await authToken();
 
       const { data } = await axios.post(
         AMS_MODEL_PATH,
@@ -246,6 +243,8 @@
     handler.value = props.predefined.personnel[0].id;
     assetStatusOptions.value = props.predefined.assetStatus;
     assetStatus.value = props.predefined.assetStatus[0].id;
+    serviceResult.value = props.predefined.serviceResult[0].id;
+    serviceResultOptions.value = props.predefined.serviceResult;
     // handleFrequencyRule(props.start);
   });
 
@@ -400,6 +399,9 @@
               v-model:equipmentUsed = "equipmentUsed"
               v-model:assetStatus = "assetStatus"
               v-model:serviceDescriptionText = "serviceDescriptionText"
+              v-model:serviceResultOptions = "serviceResultOptions"
+              v-model:serviceResult = "serviceResult"
+              v-model:maintenanceType = "maintenance"
               @attach-file = "handleFileAttachment"
               :handlerOptions = "handlerOptions"
               :assetStatusOptions = "assetStatusOptions"
