@@ -31,6 +31,7 @@ const maintenanceId = ref(props.maintenanceId);
   <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400">
     <thead class="rounded-t-lg border-b shadow-lg text-xs text-gray-600 uppercase bg-green-300 dark:bg-slate-700/70 dark:text-green-400">
       <tr class = "rounded">
+        <th scope="col" class=""></th>
         <th scope="col" class="p-5">Service</th>
         <th scope="col" class="p-5">Status</th>
         <th scope="col" class=""></th>
@@ -48,7 +49,7 @@ const maintenanceId = ref(props.maintenanceId);
         :workOrderId = "props.workOrderId"
         :workOrderRecall = "props.workOrderRecall"
       />
-      <tr aria-colspan="3" v-else>
+      <tr aria-colspan="4" v-else>
         <td class = "uppercase font-bold">No Work Order Service found.</td>
       </tr>
     </tbody>

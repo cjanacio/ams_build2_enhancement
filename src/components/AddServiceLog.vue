@@ -1,12 +1,11 @@
 <script setup>
-  import { ref } from "vue";
+  import { ref, onMounted } from "vue";
   import { useToast } from "vue-toastification";
   import InputTextArea from "./InputTextArea.vue";
   import Select from "./Select.vue";
   import Input from "./Input.vue";
   import axios from "axios";
   import { GLOBAL_PATH2, authToken } from '../assets/global.js'
-import { onMounted } from "vue";
   const toast = useToast();
   const props = defineProps({
 
@@ -42,7 +41,6 @@ import { onMounted } from "vue";
   const maintenanceType = defineModel('maintenanceType');
   const serviceResultOptions = defineModel('serviceResultOptions');
   const serviceResult = defineModel('serviceResult');
-  // console.log(serviceResult);
   const serviceDocInput = ref(null);
   const applyToEveryService = defineModel('applyToEveryService');
   const debounceTimer = 1000; //1 second
@@ -357,6 +355,5 @@ import { onMounted } from "vue";
         </ul>
       </div>
     </div>
-    
   </div>
 </template>

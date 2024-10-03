@@ -3,6 +3,7 @@
   import Button from "./Button.vue";
   import AddServiceLog from "./AddServiceLog.vue";
   import ServiceLogInfo from "./ServiceLogInfo.vue";
+  import ChangeLog from "./ChangeLog.vue";
   import axios, { AxiosError } from 'axios';
   import { authToken, AMS_MODEL_PATH } from '../assets/global.js'
   import { useToast } from "vue-toastification";
@@ -186,7 +187,7 @@
 </script>
 <template>
   <tr :style="{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "p-2 w-full bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700" ref = "childDiv">
-    <td colspan="3">
+    <td colspan="4">
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 mx-7 bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit" v-if = "serviceDetails.serviceResult === 'Open'">
         <AddServiceLog
           v-model:maintenanceType = "maintenance"
@@ -218,6 +219,14 @@
             buttonTitle = "Save Schedule"
           />
         </div>
+        <div class = "p-2 mt-1 flex grid grid-cols-1">
+          <div class='overflow-x-auto h-auto w-full justify-center items-center' :style='{ animation: "1s ease 0s 1 normal none running fadeIn" }'>
+            <div class = "px-4 mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
+              <span class = "">Change Log</span>
+            </div>
+            <ChangeLog :id = "toArray[0].id" formOrigin = "__SERVICE_" />
+          </div>
+        </div>
       </div>
       <div :style= "{ animation: '1s ease 0s 1 normal none running fadeIn' }" class = "border-x-2 dark:border-x dark:border-slate-800 md:mx-7 lg:mx-7 xl:mx-7 2xl:mx-7  bg-white dark:bg-slate-800 flex grid grid-cols-1 min-h-fit p-4" v-else-if = "serviceDetails.serviceResult === 'Closed'">
         <div class = "dark:text-slate-400 text-center font-bold text-2xl uppercase my-2 mb-4">
@@ -231,6 +240,7 @@
           :handlerOptions = "handlerOptions"
           :assetStatusOptions = "assetStatusOptions"
           :id = "toArray[0].id"
+          formOrigin = "__SERVICE_"
         />
         
       </div>

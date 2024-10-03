@@ -262,6 +262,7 @@
 
       formData.append("remarks", reasonForEdit.value);
       formData.append("id", logId.value);
+      formData.append("requestType", "__SERVICE")
       if (isChanged === false) return false;
       const auth = await authToken();
       const { data } = await axios.post(

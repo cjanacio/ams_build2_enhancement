@@ -67,7 +67,8 @@
     const id = props.id;
     const payloadBody = {
       id:id,
-      reason:reason
+      reason:reason,
+      requestType:"__WORK_ORDER"
     };
 
     const { data } = await axios.post(
@@ -236,7 +237,7 @@
                 title = "Cancel Work Order"
                 v-if = "woId === 1"
               >
-                <i class = "fa-solid fa-trash"></i>
+                <i :class = "displayWoRemarks === true ? 'fa-solid fa-times' : 'fa-solid fa-trash'"></i>
               </button>
               <button
                 class='mx-1 text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs font-normal uppercase dark:bg-slate-800 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl'
@@ -361,6 +362,7 @@
                   :assetStatusOptions = "assetStatusOptions"
                   :id = "props.id"
                   :maintenance = "maintenanceId"
+                  formOrigin = "__WORK_ORDER"
                 />
                 
               </div>

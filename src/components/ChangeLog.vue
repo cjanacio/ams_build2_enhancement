@@ -9,6 +9,10 @@ const props = defineProps({
   id: {
     type: Number,
     required: true
+  },
+  formOrigin: {
+    type: String,
+    required: true
   }
 });
 
@@ -20,7 +24,8 @@ const getChangeLog = async () => {
     const { data } = await axios.get(AMS_MODEL_PATH, {
       params: {
         id:referenceId.value,
-        form: "Service Log"
+        form: "Service Log",
+        type: props.formOrigin
       },
       headers: {
         "Content-Type":"application/json",
@@ -49,6 +54,7 @@ onMounted(() => {
       <tr class = "rounded">
         <th scope="col" class="p-5"></th>
         <th scope="col" class="p-5">Requested By</th>
+        <th scope="col" class="p-5">Request Type</th>
         <th scope="col" class="p-5">Date Requested</th>
         <th scope="col" class="p-5">Remarks</th>
         <th scope="col" class="p-5">Status</th>
@@ -62,7 +68,7 @@ onMounted(() => {
         @get-change-log = "getChangeLog"
       />
       <tr class = "p-2 bg-slate-100 border-b dark:bg-slate-700/70 dark:border-slate-700" v-else>
-        <td colspan="5" class = "px-4 py-4 uppercase font-bold text-center">No Change Log record found</td>
+        <td colspan="6" class = "px-4 py-4 uppercase font-bold text-center">No Change Log record found</td>
       </tr>
     </tbody>
   </table>

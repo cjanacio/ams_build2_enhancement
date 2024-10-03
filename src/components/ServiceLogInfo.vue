@@ -5,10 +5,7 @@
   import ChangeLog from "./ChangeLog.vue";
   import Button from "./Button.vue";
   import UpdateServiceLog from "./UpdateServiceLog.vue";
-  const activePath = thePath => thePath.substring(thePath.lastIndexOf('#') + 1);
-  const path = window.location.href;
-  const params = activePath(path);
-  const split = params.split("&"); 
+
   const props = defineProps({
     serviceData: {
       type: Array,
@@ -29,6 +26,10 @@
     maintenance: {
       type: Number,
       required: false
+    },
+    formOrigin: {
+      type: String,
+      required: false
     }
   });
   const isGoingToEditService = ref(false);
@@ -40,6 +41,10 @@
 
   const handleEditEvent = () => {
     isGoingToEditService.value = !isGoingToEditService.value;
+  }
+
+  const handleClosingOdm = () => {
+    
   }
 
   onMounted(() => {
@@ -65,7 +70,7 @@
         buttonText = ""
         buttonClass = "mx-1 float-right text-2xl text-center rounded-full hover:bg-slate-200 p-2 w-8 text-xs md:text-xs lg:text-xs xl:text-xs 2xl:text-xs font-normal uppercase dark:bg-slate-800 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-white transition ease-in-out delay-50 hover:shadow-2xl"
         buttonType = "button"
-        :onClickEvent = "handleEditEvent"
+        :onClickEvent = "handleClosingOdm"
         iconSetting = "fa-solid fa-check"
         :isDisabled = "false"
         buttonTitle = "Mark Service Log as Complete/Closed"
@@ -214,7 +219,7 @@
           <div class = "px-4 mt-4 dark:text-slate-400 text-left font-normal text-sm uppercase mb-2">
             <span class = "">Change Log</span>
           </div>
-          <ChangeLog :id = "props.id" />
+          <ChangeLog :id = "props.id" :formOrigin = "props.formOrigin" />
         </div>
       </div>
     </div>
